@@ -1,0 +1,2063 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kolhapur EV Infrastructure, GIS Audit & Business Model | Community Engagement Project</title>
+
+    <!-- Silence the Tailwind Play CDN informational console warning -->
+    <script>
+        const origWarn = console.warn;
+        console.warn = function (...args) {
+            if (args[0] && typeof args[0] === 'string' && args[0].includes('cdn.tailwindcss.com')) return;
+            origWarn.apply(console, args);
+        };
+    </script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Chart.js (Exact CDNJS path — no 404 source map warning) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+
+    <!-- Lucide Icons (Exact versioned UMD path — no 404 source map warning) -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.395.0/dist/umd/lucide.js"></script>
+
+    <!-- Leaflet GIS CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Leaflet Heatmap Plugin -->
+    <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        #gisMap {
+            height: 560px;
+            width: 100%;
+            z-index: 10;
+        }
+
+        .leaflet-popup-content-wrapper {
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800 antialiased">
+
+    <!-- Top Navigation -->
+    <header class="sticky top-0 z-50 bg-slate-900/95 backdrop-blur border-b border-slate-800 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div
+                    class="w-9 h-9 rounded-lg bg-emerald-500 flex items-center justify-center font-bold text-slate-900">
+                    EV
+                </div>
+                <div>
+                    <span class="font-bold tracking-tight text-base sm:text-lg">Kolhapur EV GIS &amp; Infra Audit</span>
+                    <span
+                        class="hidden xl:inline-block ml-2 text-xs bg-slate-800 text-emerald-400 px-2.5 py-0.5 rounded-full border border-emerald-500/30">
+                        MH-09 &amp; District GIS + Business Model (26 Oct 2026)
+                    </span>
+                </div>
+            </div>
+            <nav class="hidden lg:flex items-center space-x-5 text-xs xl:text-sm font-medium text-slate-300">
+                <a href="#overview" class="hover:text-emerald-400 transition">KPIs</a>
+                <a href="#gis-section"
+                    class="text-emerald-400 font-semibold hover:text-emerald-300 transition flex items-center gap-1">
+                    <i data-lucide="map-pin" class="w-4 h-4"></i> GIS Map
+                </a>
+                <a href="#paradox" class="hover:text-emerald-400 transition">97% Paradox</a>
+                <a href="#audit" class="hover:text-emerald-400 transition">47 Master + 37 Leads</a>
+                <a href="#community" class="hover:text-emerald-400 transition">Citizen Survey (39)</a>
+                <a href="#business-model"
+                    class="bg-amber-500/15 text-amber-300 border border-amber-400/40 px-3 py-1.5 rounded-lg font-bold hover:bg-amber-500/25 transition flex items-center gap-1.5">
+                    <i data-lucide="briefcase" class="w-4 h-4 text-amber-400"></i> Business &amp; ROI Model
+                </a>
+                <a href="#roadmap" class="hover:text-emerald-400 transition">Conclusion</a>
+            </nav>
+            <a href="https://docs.google.com/forms/d/1A42hbhEIW4Uc8-YWtsiBTBlWlnokk6yKaPkvbZJhyOk/viewform"
+                target="_blank" rel="noopener noreferrer"
+                class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold text-xs sm:text-sm px-4 py-2 rounded-lg transition shadow-sm flex items-center gap-1.5">
+                <span>Take Citizen Survey</span>
+                <i data-lucide="external-link" class="w-4 h-4"></i>
+            </a>
+        </div>
+    </header>
+
+    <!-- Hero Banner -->
+    <section
+        class="relative bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-950 text-white py-14 lg:py-20 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="max-w-3xl">
+                <div
+                    class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-400/30 text-emerald-300 text-xs font-semibold uppercase tracking-wider mb-4">
+                    Community Engagement Project • GIS Spatial, Citizen &amp; Commercial Portal (26 Oct 2026)
+                </div>
+                <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight mb-5">
+                    Lack of EV Charging Infrastructure in <span class="text-emerald-400">Kolhapur</span>: GIS Audit
+                    &amp;
+                    Deployment Business Model
+                </h1>
+                <p class="text-slate-300 text-base sm:text-lg leading-relaxed mb-7">
+                    Combining official Maharashtra Transport Department RTO records (MH-09, MH-51 &amp; Region), a
+                    47-station Master Directory (including MSEDCL Shenda Park Substation), 27 ChargeDekho discovery
+                    leads, 10 Showroom &amp; Hotel Sayaji corridor audit records, 39 verified citizen survey responses,
+                    and a complete commercial deployment business model for investors.
+                </p>
+                <div class="flex flex-wrap gap-3.5">
+                    <a href="#gis-section"
+                        class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-5 py-3 rounded-xl transition flex items-center gap-2">
+                        <i data-lucide="map" class="w-5 h-5"></i>
+                        <span>Launch Interactive GIS Map</span>
+                    </a>
+                    <a href="#business-model"
+                        class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-5 py-3 rounded-xl transition flex items-center gap-2 shadow-md">
+                        <i data-lucide="briefcase" class="w-5 h-5"></i>
+                        <span>Investor Business &amp; ROI Model</span>
+                    </a>
+                    <a href="#audit"
+                        class="bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/40 font-semibold px-5 py-3 rounded-xl transition flex items-center gap-2">
+                        <i data-lucide="database" class="w-5 h-5"></i>
+                        <span>47 Master + 37 Leads</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 1: KPI Executive Summary -->
+    <section id="overview" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 relative z-20">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div class="bg-white rounded-2xl p-6 shadow-md border border-slate-200/80">
+                <div class="flex items-center justify-between text-slate-400 mb-2">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500">MH-09 Total Fleet (Mar
+                        2025)</span>
+                    <i data-lucide="car" class="w-5 h-5 text-blue-600"></i>
+                </div>
+                <div class="text-3xl font-extrabold text-slate-900">1,842,263</div>
+                <p class="text-xs text-slate-600 mt-2">
+                    <span class="font-bold text-blue-600">60,246</span> new MH-09 registrations in FY 24–25 (plus
+                    <span class="font-semibold">19,748</span> in Ichalkaranji MH-51; <span
+                        class="font-semibold">204,486</span> in Kolhapur Region).
+                </p>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 shadow-md border border-slate-200/80">
+                <div class="flex items-center justify-between text-slate-400 mb-2">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500">District EV Sales (FY
+                        24–25)</span>
+                    <i data-lucide="trending-up" class="w-5 h-5 text-emerald-600"></i>
+                </div>
+                <div class="text-3xl font-extrabold text-slate-900">15,044 <span
+                        class="text-base font-bold text-emerald-600">+45.89%</span></div>
+                <p class="text-xs text-slate-600 mt-2">
+                    Up from <span class="font-semibold">10,312 EVs</span> in FY 2023–24 (+4,732 YoY; headline rounds to
+                    42%, exact count is 45.89%).
+                </p>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 shadow-md border border-slate-200/80">
+                <div class="flex items-center justify-between text-slate-400 mb-2">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500">E-2W Market Dominance</span>
+                    <i data-lucide="zap" class="w-5 h-5 text-amber-500"></i>
+                </div>
+                <div class="text-3xl font-extrabold text-slate-900">96.91%</div>
+                <p class="text-xs text-slate-600 mt-2">
+                    <span class="font-bold text-amber-600">14,579 Electric 2-Wheelers</span> (+45.17% YoY) vs. only
+                    <span class="font-semibold">393 Cars (2.61%)</span> &amp; <span class="font-semibold">33 Goods 3W
+                        (0.22%)</span>.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 shadow-md border border-slate-200/80">
+                <div class="flex items-center justify-between text-slate-400 mb-2">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Master + Oct 2026
+                        Audit</span>
+                    <i data-lucide="map-pin-off" class="w-5 h-5 text-rose-600"></i>
+                </div>
+                <div class="text-3xl font-extrabold text-slate-900">47 Master <span
+                        class="text-base font-bold text-rose-600">+ 37 Leads</span></div>
+                <p class="text-xs text-slate-600 mt-2">
+                    Added <strong>#47 MSEDCL Shenda Park</strong>; <strong>27 Highway/Dir Leads (L01–L27)</strong> &amp;
+                    <strong>10 Showroom/Sayaji Leads (N01–N10)</strong>.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 2: Interactive Open-Source GIS Web-Map & Spatial Gap Analysis -->
+    <section id="gis-section" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8">
+        <div class="flex flex-col lg:flex-row lg:items-end justify-between mb-6 gap-4">
+            <div>
+                <div
+                    class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full mb-2">
+                    <i data-lucide="layers" class="w-3.5 h-3.5"></i> Geospatial Decision Support System (Leaflet GIS •
+                    Rechecked 26 Oct 2026)
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900">1. Interactive GIS Map: 47 Master
+                    Stations, 27 Discovery Leads &amp; 10 Showroom/Sayaji Audits</h2>
+                <p class="text-slate-600 mt-1 text-sm max-w-3xl">
+                    Explore all <strong>47 Master Directory records</strong> (including <strong>#47 PowerUP / MSEDCL
+                        Shenda Park Substation</strong> at <code
+                        class="text-xs bg-slate-200 px-1.5 py-0.5 rounded">16.67417°N, 74.237358°E</code>), toggle the
+                    <strong>27 ChargeDekho Discovery Leads (L01–L27)</strong>, and inspect the <strong>10 Showroom &amp;
+                        Hotel Sayaji Rechecked Leads (N01–N10)</strong>.
+                </p>
+            </div>
+
+            <!-- Quick Camera Jump Buttons + Map Style Selector -->
+            <div class="flex flex-wrap items-center gap-2 shrink-0">
+                <select id="basemapSelect" onchange="switchBasemap(this.value)"
+                    class="bg-white border border-slate-300 text-slate-800 text-xs font-semibold px-3 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    <option value="street">Map Style: Esri World Street (Default)</option>
+                    <option value="googleRoad">Map Style: Detailed City Streets</option>
+                    <option value="topo">Map Style: OpenTopoMap (Terrain)</option>
+                    <option value="esriSat">Map Style: Esri Satellite Imagery</option>
+                </select>
+                <button onclick="flyToView(16.7033, 74.2420, 13)"
+                    class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-3.5 py-2 rounded-xl transition">
+                    City Core &amp; Sayaji
+                </button>
+                <button onclick="locateStation(47)"
+                    class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3.5 py-2 rounded-xl transition">
+                    #47 Shenda Park MSEDCL
+                </button>
+                <button onclick="flyToView(16.5500, 74.2600, 9)"
+                    class="bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-semibold px-3.5 py-2 rounded-xl transition">
+                    Full District
+                </button>
+            </div>
+        </div>
+
+        <!-- GIS Layer Toolbar -->
+        <div
+            class="bg-white p-4 rounded-t-2xl border border-b-0 border-slate-200 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex flex-wrap items-center gap-2.5 text-xs font-medium">
+                <span class="font-bold text-slate-700 uppercase tracking-wider mr-1">GIS Layers:</span>
+                <label
+                    class="inline-flex items-center gap-1.5 cursor-pointer bg-emerald-50 text-emerald-900 px-3 py-1.5 rounded-lg border border-emerald-200">
+                    <input type="checkbox" id="toggle2W" checked class="rounded text-emerald-600" />
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>
+                    <span>2W/3W &amp; Mixed (13)</span>
+                </label>
+                <label
+                    class="inline-flex items-center gap-1.5 cursor-pointer bg-blue-50 text-blue-900 px-3 py-1.5 rounded-lg border border-blue-200">
+                    <input type="checkbox" id="toggleCar" checked class="rounded text-blue-600" />
+                    <span class="w-2.5 h-2.5 rounded-full bg-blue-600 inline-block"></span>
+                    <span>Car / 4W Only (34)</span>
+                </label>
+                <label
+                    class="inline-flex items-center gap-1.5 cursor-pointer bg-purple-50 text-purple-900 px-3 py-1.5 rounded-lg border border-purple-200">
+                    <input type="checkbox" id="toggleLeads" checked class="rounded text-purple-600" />
+                    <span class="w-2.5 h-2.5 rounded-full bg-purple-600 inline-block"></span>
+                    <span>Oct 2026 Leads L01–L27 (27)</span>
+                </label>
+                <label
+                    class="inline-flex items-center gap-1.5 cursor-pointer bg-amber-50 text-amber-900 px-3 py-1.5 rounded-lg border border-amber-300">
+                    <input type="checkbox" id="toggleShowroom" checked class="rounded text-amber-600" />
+                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span>
+                    <span>Showroom &amp; Sayaji N01–N10 (10)</span>
+                </label>
+                <label
+                    class="inline-flex items-center gap-1.5 cursor-pointer bg-rose-50 text-rose-900 px-3 py-1.5 rounded-lg border border-rose-200">
+                    <input type="checkbox" id="toggleDeserts" checked class="rounded text-rose-600" />
+                    <span class="w-2.5 h-2.5 rounded-sm bg-rose-500 inline-block"></span>
+                    <span>Charging Deserts (4 Zones)</span>
+                </label>
+                <label
+                    class="inline-flex items-center gap-1.5 cursor-pointer bg-slate-100 text-slate-800 px-3 py-1.5 rounded-lg border border-slate-300">
+                    <input type="checkbox" id="toggleHeat" class="rounded text-slate-600" />
+                    <span>Heatmap</span>
+                </label>
+                <label
+                    class="inline-flex items-center gap-1.5 cursor-pointer bg-slate-100 text-slate-800 px-3 py-1.5 rounded-lg border border-slate-300">
+                    <input type="checkbox" id="toggleBuffers" class="rounded text-slate-600" />
+                    <span>1 km Rings</span>
+                </label>
+            </div>
+
+            <!-- Participatory Citizen Pin Mode -->
+            <div class="flex items-center gap-2">
+                <button id="citizenPinModeBtn" onclick="toggleCitizenPinMode()"
+                    class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 shadow-sm">
+                    <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                    <span id="pinModeText">Click Map to Suggest New Charger Pin</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Map Container + Side Spatial Analytics Panel -->
+        <div
+            class="grid grid-cols-1 lg:grid-cols-12 border border-slate-200 rounded-b-2xl overflow-hidden shadow-md bg-white">
+            <div class="lg:col-span-8 relative">
+                <div id="gisMap"></div>
+            </div>
+
+            <!-- Right Sidebar: Spatial Buffer & Coordinate Audit Metrics -->
+            <div class="lg:col-span-4 p-5 bg-slate-900 text-white flex flex-col justify-between space-y-5">
+                <div class="space-y-3.5">
+                    <div>
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-400">Coordinate &amp;
+                            Showroom Recheck Audit (26 Oct 2026)</span>
+                        <h3 class="text-lg font-bold mt-0.5">Spatial &amp; Deduplication Breakdown</h3>
+                        <p class="text-xs text-slate-400 mt-1">
+                            <strong>8 Master Stations</strong> have exact published coordinates (BEE India, Open Charge
+                            Map, evgoo; Lat mean: <strong>16.6552°N</strong>, SD: <strong>0.1779°</strong>); <strong>39
+                                rows</strong> use locality pins + Google Maps links.
+                        </p>
+                    </div>
+
+                    <!-- Radial Ring & Registry Bars -->
+                    <div class="space-y-2.5 text-xs">
+                        <div class="bg-slate-800/90 p-3 rounded-xl border border-emerald-500/40">
+                            <div class="flex justify-between font-semibold mb-1">
+                                <span>Master Record #47 Added</span>
+                                <span class="text-emerald-400">Shenda Park MSEDCL</span>
+                            </div>
+                            <div class="text-[11px] text-slate-300 leading-relaxed">
+                                <strong>Coords:</strong> 16.674170°N, 74.237358°E (BEE Register).
+                                <strong>Specs:</strong>
+                                15 kW Bharat DC-001 + 25/50 kW CCS-II &amp; CHAdeMO (3 points). <em>Statiq ID 9184 lists
+                                    CCS-2/CHAdeMO unavailable; live status unconfirmed.</em>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-800/90 p-3 rounded-xl border border-amber-500/40">
+                            <div class="flex justify-between font-semibold mb-1">
+                                <span>Showroom &amp; Sayaji Recheck (N01–N10)</span>
+                                <span class="text-amber-400">10 Audit Records</span>
+                            </div>
+                            <div class="text-[11px] text-slate-300 leading-relaxed">
+                                Flags <strong>E-Fill (N01) vs. Vijaya Power (N02)</strong> alias overlap at DYP City
+                                Mall
+                                near Hotel Sayaji, <strong>MAI Hyundai (N03)</strong> 30 kW vs. 120 kW conflict,
+                                <strong>Mohite Suzuki (N06)</strong> unverified dealership category, and
+                                <strong>Reliance Mall Laxmipuri (N08)</strong> 30 kW Jio-bp candidate.
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-800/90 p-3 rounded-xl border border-purple-500/40">
+                            <div class="flex justify-between font-semibold mb-1">
+                                <span>ChargeDekho Discovery Leads (L01–L27)</span>
+                                <span class="text-purple-400">60–360 kW DC</span>
+                            </div>
+                            <div class="text-[11px] text-slate-300 mt-0.5">
+                                27 candidate leads (mean: <strong>106.67 kW</strong>, median: <strong>120 kW</strong>):
+                                13 BPCL HelloBPCL, 1 Mahindra Charge_iN (360 kW), 1 TCZ Burger King (240 kW), 1 Hyundai
+                                McD (180 kW). Held separately pending deduplication.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Identified Charging Deserts Box -->
+                    <div class="bg-rose-950/60 border border-rose-500/40 rounded-xl p-3.5 text-xs space-y-1">
+                        <div class="font-bold text-rose-300 flex items-center gap-1.5">
+                            <i data-lucide="alert-octagon" class="w-4 h-4"></i>
+                            <span>4 Critical Urban "Charging Deserts" Identified</span>
+                        </div>
+                        <p class="text-slate-300 text-[11px] leading-relaxed">
+                            Red polygons on the map highlight dense residential/student zones with <strong>zero verified
+                                public 2W charging hubs</strong>:
+                            (1) <strong>Shivaji Peth &amp; Rankala Belt</strong>, (2) <strong>Mangalwar Peth /
+                                Khasbag</strong>, (3) <strong>Laxmipuri / Gujari Market</strong> (where N08 Reliance
+                            Mall
+                            is a 30 kW car candidate), and (4) <strong>Shivaji University Campus Core</strong>.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Citizen Requested Pins Counter -->
+                <div id="userPinLog" class="bg-slate-800 p-3 rounded-xl border border-slate-700 text-xs">
+                    <div class="font-semibold text-amber-300">Participatory GIS Pin Log:</div>
+                    <div id="userPinList" class="text-[11px] text-slate-300 mt-1">
+                        Toggle "Click Map to Suggest New Charger Pin" above and click any underserved neighborhood on
+                        the map.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3: The Core Analytical Paradox & Multi-Source Benchmarks -->
+    <section id="paradox" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="mb-8">
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900">2. Quantitative Data Analysis: RTO Scope,
+                47-Site Master &amp; Directory Benchmarks</h2>
+            <p class="text-slate-600 mt-1 max-w-3xl text-sm">
+                While <strong>96.91% (14,579 of 15,044)</strong> of reported EV registrations in Kolhapur are electric
+                two-wheelers, <strong>72.34% (34 of 47)</strong> of Master Directory stations cater exclusively to
+                4-wheeler passenger cars.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <h3 class="font-bold text-slate-900 text-lg mb-1">Structural Mismatch: EV Demand vs. 47-Site Charger
+                    Supply</h3>
+                <p class="text-xs text-slate-500 mb-4">Comparing FY 2024–25 EV registrations (n = 15,044) against
+                    Updated
+                    Master Directory stations (n = 47)</p>
+                <div class="h-64">
+                    <canvas id="mismatchChart"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <h3 class="font-bold text-slate-900 text-lg mb-1">Rapid EV Adoption Trajectory (FY 2023–24 vs. FY
+                    2024–25)</h3>
+                <p class="text-xs text-slate-500 mb-4">District-level annual EV registrations show 45.89% overall growth
+                    (+4,732 vehicles in one year; E-2W +45.17%)</p>
+                <div class="h-64">
+                    <canvas id="growthChart"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <h3 class="font-bold text-slate-900 text-lg mb-1">Why Directory Counts Vary: Multi-Source &amp; FAME-II
+                    Benchmark</h3>
+                <p class="text-xs text-slate-500 mb-4">Comparing charging points vs. station pages vs. FAME-II scheme
+                    installations &amp; Lead Sheets (26 Oct 2026)</p>
+                <div class="h-64">
+                    <canvas id="benchmarkChart"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <h3 class="font-bold text-slate-900 text-lg mb-1">Verified Station Connector Health (9 Audited Sites +
+                    Shenda Park)</h3>
+                <p class="text-xs text-slate-500 mb-4">Status of 16 connectors across the 9 verified technical sites
+                    (plus MSEDCL Shenda Park Statiq snapshot)</p>
+                <div class="h-64">
+                    <canvas id="auditChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Methodological & RTO Scope Callout Banner -->
+        <div
+            class="mt-8 bg-slate-900 text-white rounded-2xl p-6 sm:p-7 border border-slate-800 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+            <div class="lg:col-span-8 space-y-2">
+                <div class="text-emerald-400 text-xs font-bold uppercase tracking-wider">Official RTO Registration
+                    Hierarchy &amp; Methodological Caveat (FY 2024–25)</div>
+                <h3 class="text-lg sm:text-xl font-bold">Distinguishing Kolhapur RTO (MH-09), Ichalkaranji RTO (MH-51),
+                    District &amp; Region</h3>
+                <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">
+                    Per the <em>Maharashtra Transport Department Statistics Information 2024–25</em> report,
+                    <strong>Kolhapur RTO (MH-09)</strong> recorded <strong>60,246 new registrations</strong> and a total
+                    registered vehicle population of <strong>1,842,263</strong> as of 31 March 2025.
+                    <strong>Ichalkaranji RTO (MH-51)</strong> is a separate office with <strong>19,748 new
+                        registrations</strong>, while the <strong>Kolhapur Region aggregate</strong> (Kolhapur, Sangli,
+                    Satara, Karad, Ichalkaranji) recorded <strong>204,486 new registrations</strong>.
+                    <span class="text-amber-300 font-semibold">Important Caveat:</span> The ratio $15,044 / 60,246 =
+                    24.97\%$ must <strong>not</strong> be published as a definitive EV penetration rate because the
+                    $15,044$ EV numerator (reported by <em>ET Auto / Times of India</em> on 4 April 2025) reflects
+                    district-level reporting while $60,246$ is the MH-09 office denominator. Official EV-only VAHAN /
+                    Dataful extracts (updated 5 Oct 2026) should be filtered by BEV-only and matched by exact RTO scope.
+                </p>
+            </div>
+            <div class="lg:col-span-4 grid grid-cols-2 gap-3 text-center">
+                <div class="bg-slate-800 p-3.5 rounded-xl border border-slate-700">
+                    <div class="text-xl font-extrabold text-white">60,246</div>
+                    <div class="text-[11px] text-slate-400">Kolhapur RTO (MH-09) New Reg (FY 24–25)</div>
+                </div>
+                <div class="bg-slate-800 p-3.5 rounded-xl border border-slate-700">
+                    <div class="text-xl font-extrabold text-indigo-400">19,748</div>
+                    <div class="text-[11px] text-slate-400">Ichalkaranji RTO (MH-51) New Reg</div>
+                </div>
+                <div class="bg-slate-800 p-3.5 rounded-xl border border-slate-700">
+                    <div class="text-xl font-extrabold text-emerald-400">204,486</div>
+                    <div class="text-[11px] text-slate-400">Kolhapur Region Total New Reg</div>
+                </div>
+                <div class="bg-slate-800 p-3.5 rounded-xl border border-slate-700">
+                    <div class="text-xl font-extrabold text-amber-400">35 / 35</div>
+                    <div class="text-[11px] text-slate-400">FAME-II Installed / Operational (Jul 2026)</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 4: Interactive 47-Station Master Directory + 27 ChargeDekho Leads + 10 Showroom & Sayaji Rechecked Leads -->
+    <section id="audit" class="bg-white border-y border-slate-200 py-14">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col lg:flex-row lg:items-end justify-between mb-6 gap-4">
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900">3. Charging Station Master Directory
+                        (47) &amp; Rechecked Lead Sheets (27 + 10)</h2>
+                    <p class="text-slate-600 mt-1 text-sm">
+                        Switch between the <strong>47 Master Directory stations</strong> (including <strong>#47 MSEDCL
+                            Shenda Park</strong>), the <strong>27 ChargeDekho Discovery Leads (L01–L27)</strong>, and
+                        the
+                        newly rechecked <strong>10 Showroom &amp; Hotel Sayaji Leads (N01–N10)</strong>.
+                    </p>
+                </div>
+                <!-- 3-Way Tab Switcher -->
+                <div class="inline-flex flex-wrap rounded-xl bg-slate-100 p-1 border border-slate-200 shrink-0 gap-1">
+                    <button id="tabMasterBtn" onclick="switchDirectoryTab('MASTER')"
+                        class="px-3.5 py-2 rounded-lg text-xs font-bold bg-slate-900 text-white shadow-sm transition">
+                        Master Directory (47)
+                    </button>
+                    <button id="tabLeadsBtn" onclick="switchDirectoryTab('LEADS')"
+                        class="px-3.5 py-2 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition">
+                        Oct 2026 Leads • L01–L27 (27)
+                    </button>
+                    <button id="tabShowroomBtn" onclick="switchDirectoryTab('SHOWROOM')"
+                        class="px-3.5 py-2 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition">
+                        Showroom &amp; Sayaji Audit • N01–N10 (10)
+                    </button>
+                </div>
+            </div>
+
+            <!-- TAB 1: 47-Station Master Directory -->
+            <div id="masterTabContainer">
+                <!-- Filters -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Search Station / Locality /
+                            Operator</label>
+                        <input id="searchInput" type="text"
+                            placeholder="e.g. Shenda Park, MSEDCL, Tarabai Park, Shiroli..."
+                            class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:outline-none" />
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Geographic Scope</label>
+                        <select id="scopeFilter"
+                            class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                            <option value="ALL">All Scopes (47)</option>
+                            <option value="City">Kolhapur City (19)</option>
+                            <option value="District">District / Highway (27)</option>
+                            <option value="City fringe">City Fringe (1)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Target Vehicle Segment</label>
+                        <select id="vehicleFilter"
+                            class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                            <option value="ALL">All Vehicle Types (47)</option>
+                            <option value="2W">2W / 3W &amp; Multi-Vehicle (13)</option>
+                            <option value="CAR">Car / 4W Only (34)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Coordinate &amp; Verification
+                            Filter</label>
+                        <select id="verifyFilter"
+                            class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                            <option value="ALL">All Records (47)</option>
+                            <option value="EXACT">Published Exact Coordinates Only (8)</option>
+                            <option value="High">High Verification (15)</option>
+                            <option value="Medium">Medium Verification (28)</option>
+                            <option value="Low/Medium">Low/Medium - Needs Audit (4)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between text-xs text-slate-500 mb-3 px-1">
+                    <span>Showing <strong id="stationCount" class="text-slate-900">47</strong> of 47 Master Directory
+                        records</span>
+                    <span class="text-emerald-700 font-semibold">★ = Published BEE / OpenChargeMap / evgoo Coordinates
+                        (8
+                        Sites)</span>
+                </div>
+
+                <!-- Master Table -->
+                <div
+                    class="overflow-x-auto rounded-2xl border border-slate-200 shadow-sm max-h-[520px] overflow-y-auto">
+                    <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                        <thead class="bg-slate-900 text-white sticky top-0 z-10">
+                            <tr>
+                                <th class="py-3.5 px-4 font-semibold">#</th>
+                                <th class="py-3.5 px-4 font-semibold">Station Name &amp; Operator</th>
+                                <th class="py-3.5 px-4 font-semibold">Area / Locality</th>
+                                <th class="py-3.5 px-4 font-semibold">Target Vehicle</th>
+                                <th class="py-3.5 px-4 font-semibold">Charger / Power / Slots</th>
+                                <th class="py-3.5 px-4 font-semibold">Coordinate &amp; Status Audit</th>
+                                <th class="py-3.5 px-4 font-semibold text-right">GIS &amp; Maps</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stationTableBody" class="divide-y divide-slate-200 bg-white"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB 2: 27 New Candidate Discovery Leads (Oct 2026) -->
+            <div id="leadsTabContainer" class="hidden">
+                <div
+                    class="bg-purple-50 border border-purple-200 rounded-2xl p-4 mb-5 text-xs text-purple-950 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <strong class="text-purple-900 uppercase tracking-wider block mb-0.5">Methodological Guardrail •
+                            27 Candidate Leads (Checked 2026-10-26 via ChargeDekho)</strong>
+                        These 27 candidate records (60 kW to 360 kW DC; mean: <strong>106.67 kW</strong>, median:
+                        <strong>120 kW</strong>, SD: <strong>67.25 kW</strong>) are held in a separate discovery lead
+                        table. Do <strong>not</strong> treat them as 27 confirmed new physical stations until alias
+                        overlap (6 leads) and 0%-availability records (5 leads) are field-verified.
+                    </div>
+                    <input id="leadSearchInput" type="text"
+                        placeholder="Search 27 leads (e.g. BPCL, 360 kW, Burger King)..."
+                        class="sm:w-72 px-3.5 py-2 text-xs rounded-xl border border-purple-300 bg-white focus:outline-none focus:ring-2 focus:ring-purple-600 shrink-0" />
+                </div>
+
+                <div
+                    class="overflow-x-auto rounded-2xl border border-slate-200 shadow-sm max-h-[520px] overflow-y-auto">
+                    <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                        <thead class="bg-slate-900 text-white sticky top-0 z-10">
+                            <tr>
+                                <th class="py-3.5 px-4 font-semibold">Lead ID</th>
+                                <th class="py-3.5 px-4 font-semibold">Candidate Station Name</th>
+                                <th class="py-3.5 px-4 font-semibold">Locality (Directory)</th>
+                                <th class="py-3.5 px-4 font-semibold">Operator / Network</th>
+                                <th class="py-3.5 px-4 font-semibold">Reported Config</th>
+                                <th class="py-3.5 px-4 font-semibold">Directory Note &amp; Deduplication Review</th>
+                                <th class="py-3.5 px-4 font-semibold text-right">Verify Location</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leadsTableBody" class="divide-y divide-slate-200 bg-white"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB 3: 10 Showroom & Hotel Sayaji Rechecked Leads (N01–N10) -->
+            <div id="showroomTabContainer" class="hidden">
+                <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-5 text-xs text-amber-950 space-y-2">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                            <strong class="text-amber-900 uppercase tracking-wider block mb-0.5">Showroom &amp; Hotel
+                                Sayaji Corridor Audit (N01–N10 • Checked 2026-10-26)</strong>
+                            Contains 10 newly rechecked dealership, mall, and Hotel Sayaji / Kawala Naka corridor
+                            listings (reported max power across 7 rated records: mean = <strong>85.71 kW</strong>,
+                            median = <strong>60.00 kW</strong>, range = <strong>30–180 kW</strong>, SD = <strong>55.93
+                                kW</strong>). These are <strong>not 10 confirmed additional unique sites</strong>; 5
+                            reconcile existing aliases/conflicts, 3 are distinct-site candidates, 1 is a new urban
+                            candidate (Reliance Mall Laxmipuri), and 1 is an unverified dealership category lead (Mohite
+                            Suzuki).
+                        </div>
+                        <input id="showroomSearchInput" type="text"
+                            placeholder="Search N01–N10 (e.g. Sayaji, MAI Hyundai, Suzuki, Reliance)..."
+                            class="sm:w-72 px-3.5 py-2 text-xs rounded-xl border border-amber-300 bg-white focus:outline-none focus:ring-2 focus:ring-amber-600 shrink-0" />
+                    </div>
+                    <!-- 5 Official Audit Warnings from Worksheet -->
+                    <div
+                        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2.5 pt-2 border-t border-amber-200/80 text-[11px]">
+                        <div class="bg-white p-2.5 rounded-xl border border-amber-200">
+                            <strong class="text-amber-900 block">1. Key Discrepancy (MAI Hyundai):</strong>
+                            Appears under multiple networks (ChargeZone / Statiq) at GPT Complex opp. Opal Hotel with
+                            conflicting ratings (<strong>30 kW vs. 120 kW</strong>); verify nameplate before finalizing.
+                        </div>
+                        <div class="bg-white p-2.5 rounded-xl border border-amber-200">
+                            <strong class="text-amber-900 block">2. Hotel Sayaji / DYP Mall Area:</strong>
+                            <strong>E-Fill (N01: 120+60 kW)</strong> and <strong>Vijaya Power (N02: 60+30 kW)</strong>
+                            both point to DYP City Mall near Hotel Sayaji; reconcile as one physical site unless
+                            separate
+                            bays are proven.
+                        </div>
+                        <div class="bg-white p-2.5 rounded-xl border border-amber-200">
+                            <strong class="text-rose-700 block">3. Mohite Suzuki (N06 Warning):</strong>
+                            Local business listing at Rote Chambers, Kawala Naka labels the dealership under a charging
+                            category, but <strong>no public connector/power specification exists</strong>; keep
+                            unverified.
+                        </div>
+                        <div class="bg-white p-2.5 rounded-xl border border-amber-200">
+                            <strong class="text-emerald-800 block">4. Laxmipuri Urban Candidate (N08):</strong>
+                            <strong>Reliance Mall (Subhash Road, Old Dalal Market, Laxmipuri)</strong> lists a Jio-bp
+                            pulse DC CCS2 charger up to 30 kW—potential relief for the Laxmipuri commercial ward if
+                            verified live.
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    class="overflow-x-auto rounded-2xl border border-slate-200 shadow-sm max-h-[520px] overflow-y-auto">
+                    <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                        <thead class="bg-slate-900 text-white sticky top-0 z-10">
+                            <tr>
+                                <th class="py-3.5 px-4 font-semibold">Lead ID</th>
+                                <th class="py-3.5 px-4 font-semibold">Candidate / Listing Name</th>
+                                <th class="py-3.5 px-4 font-semibold">Area / Landmark</th>
+                                <th class="py-3.5 px-4 font-semibold">Operator / Network Shown</th>
+                                <th class="py-3.5 px-4 font-semibold">Reported Details</th>
+                                <th class="py-3.5 px-4 font-semibold">Current Audit Decision &amp; Alias Handling</th>
+                                <th class="py-3.5 px-4 font-semibold text-right">GIS &amp; Maps</th>
+                            </tr>
+                        </thead>
+                        <tbody id="showroomTableBody" class="divide-y divide-slate-200 bg-white"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 5: Community Engagement & Live Google Form Integration (Preserved Theme & Cosmetics) -->
+    <section id="community" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+        <div
+            class="bg-gradient-to-br from-emerald-900 via-slate-900 to-slate-900 text-white rounded-3xl p-6 sm:p-10 shadow-xl border border-emerald-500/20">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                <div class="lg:col-span-7 space-y-6">
+                    <div>
+                        <span
+                            class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-xs font-bold uppercase tracking-wider">
+                            Participatory Citizen Research
+                        </span>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold mt-3">4. Community Engagement &amp; Citizen
+                            Survey
+                            Hub</h2>
+                        <p class="text-slate-300 text-sm mt-2 leading-relaxed">
+                            Verified responses from <strong>39 Kolhapur EV users</strong> (Oct 13–16, 2026) are synced
+                            below: <strong>89.74%</strong> use 2-Wheelers, <strong>74.36%</strong> commute for
+                            college/work (mean travel distance: <strong>27.82 km/day</strong>, median: <strong>20.00
+                                km</strong>, SD: <strong>18.09 km</strong>), <strong>79.49%</strong> rely on home
+                            charging, <strong>66.67%</strong> state public chargers are insufficient, and
+                            <strong>100%</strong> agree better infrastructure encourages EV switching.
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-800/90 border border-slate-700 rounded-2xl p-5 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-bold text-sm text-emerald-400 flex items-center gap-2">
+                                <i data-lucide="database" class="w-4 h-4"></i>
+                                <span>Sync Live Google Form Responses (.CSV)</span>
+                            </h3>
+                            <span id="surveyBadge"
+                                class="text-[11px] bg-emerald-500/20 text-emerald-300 px-2.5 py-0.5 rounded-full border border-emerald-400/30">
+                                Live Synced: 39 Responses (Oct 2026)
+                            </span>
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <label
+                                class="flex-1 cursor-pointer bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold py-2.5 px-4 rounded-xl border border-slate-600 transition flex items-center justify-center gap-2">
+                                <i data-lucide="upload" class="w-4 h-4 text-emerald-400"></i>
+                                <span>Upload Google Form Responses (.CSV)</span>
+                                <input id="csvFileInput" type="file" accept=".csv" class="hidden" />
+                            </label>
+                            <button
+                                onclick="navigator.clipboard.writeText('https://docs.google.com/forms/d/1A42hbhEIW4Uc8-YWtsiBTBlWlnokk6yKaPkvbZJhyOk/viewform'); this.innerText='Copied Survey Link!';"
+                                class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold py-2.5 px-4 rounded-xl transition">
+                                Copy Shareable Survey Link
+                            </button>
+                        </div>
+                        <div id="csvSummaryBox"
+                            class="bg-slate-900/90 p-4 rounded-xl border border-emerald-500/40 text-xs space-y-1.5">
+                            <div class="font-bold text-emerald-400">Verified Survey Highlights (N = 39 Respondents • 15
+                                Questions)</div>
+                            <div class="text-slate-300">
+                                • <strong>Top Demanded Features (Q13):</strong> Fast charging (<strong>92.31%</strong>),
+                                24×7 availability (<strong>76.92%</strong>), Low cost (<strong>58.97%</strong>),
+                                Real-time status (<strong>51.28%</strong>), Easy payment &amp; Safety
+                                (<strong>43.59%</strong> each).
+                            </div>
+                            <div class="text-slate-300">
+                                • <strong>Nearest Charger Distance (Q8):</strong> 3–5 km (<strong>35.90%</strong>),
+                                &gt;5 km (<strong>23.08%</strong>), 1–3 km (<strong>17.95%</strong>), Don't know
+                                (<strong>15.38%</strong>), &lt;1 km (<strong>7.69%</strong>) | <strong>Satisfaction
+                                    (Q10):</strong> 64.10% Neutral (Mean: 3.10/5, SD: 0.99).
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="bg-slate-800/70 p-4 rounded-2xl border border-slate-700">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-2">Top Citizen
+                                Charging Pain Points (Q7 &amp; Q9)</h4>
+                            <div class="h-48">
+                                <canvas id="communityPainChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="bg-slate-800/70 p-4 rounded-2xl border border-slate-700">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-2">Most Demanded
+                                Charger Locations (Q12)</h4>
+                            <div class="h-48">
+                                <canvas id="communityLocChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    class="lg:col-span-5 bg-white text-slate-900 rounded-2xl overflow-hidden shadow-lg border border-slate-200">
+                    <div class="bg-slate-100 px-4 py-3 border-b border-slate-200 flex items-center justify-between">
+                        <span class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                            Live Embedded Google Form
+                        </span>
+                        <a href="https://docs.google.com/forms/d/1A42hbhEIW4Uc8-YWtsiBTBlWlnokk6yKaPkvbZJhyOk/viewform"
+                            target="_blank" class="text-xs font-semibold text-emerald-700 hover:underline">
+                            Open in New Tab ↗
+                        </a>
+                    </div>
+                    <iframe
+                        src="https://docs.google.com/forms/d/1A42hbhEIW4Uc8-YWtsiBTBlWlnokk6yKaPkvbZJhyOk/viewform?embedded=true"
+                        width="100%" height="520" frameborder="0" marginheight="0" marginwidth="0"
+                        class="w-full bg-white">
+                        Loading Google Form…
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- NEW SECTION 6: Commercial EV Charging Business Model & Investor Planning Hub (#business-model) -->
+    <section id="business-model" class="bg-white border-y border-slate-200 py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Section Header -->
+            <div class="flex flex-col lg:flex-row lg:items-end justify-between mb-10 gap-4">
+                <div>
+                    <div
+                        class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-800 bg-amber-100 border border-amber-300 px-3 py-1 rounded-full mb-2">
+                        <i data-lucide="briefcase" class="w-3.5 h-3.5"></i> Commercial Deployment &amp; Investor
+                        Planning Suite
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900">5. EV Charging Station Business
+                        Model, CAPEX/OPEX &amp; ROI Simulator for Kolhapur</h2>
+                    <p class="text-slate-600 mt-1 text-sm max-w-3xl">
+                        A complete engineering and financial blueprint for Charge Point Operators (CPOs), commercial
+                        property owners, colleges, malls, and highway landowners in Kolhapur—modeled on MSEDCL EV
+                        tariffs, local vehicle demand (<strong>96.91% E-2Ws</strong>), and citizen survey priorities
+                        (<strong>74.36% Colleges/Offices</strong>, <strong>58.97% Malls/Commercial</strong>).
+                    </p>
+                </div>
+                <div
+                    class="text-xs bg-slate-900 text-emerald-400 px-4 py-2.5 rounded-xl border border-slate-800 shrink-0">
+                    <strong>MSEDCL EV Tariff Benchmark:</strong> ~₹7.80–₹8.30/kWh + Demand Charges
+                </div>
+            </div>
+
+            <!-- 3 Turnkey Deployment Archetype Cards for Kolhapur -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
+                <!-- Tier 1 Card -->
+                <div
+                    class="bg-slate-50 rounded-2xl p-6 border-2 border-emerald-500/80 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span
+                                class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800">
+                                Tier-1 • Best for 96.91% E-2W Market
+                            </span>
+                            <span class="text-xs font-bold text-slate-500">33 kW LT Load</span>
+                        </div>
+                        <h3 class="text-lg font-extrabold text-slate-900">2W/3W Campus &amp; Ward AC Micro-Hub</h3>
+                        <p class="text-xs text-slate-500 mt-1 mb-4">
+                            <strong>Target Zones:</strong> Shivaji University, Colleges, Laxmipuri, Shivaji Peth,
+                            Rankala,
+                            Mahalaxmi Temple &amp; Apartment Parking (74.36% survey demand).
+                        </p>
+                        <div class="space-y-2 text-xs border-t border-slate-200 pt-3">
+                            <div class="flex justify-between"><span>Hardware (3× Bharat AC001 + 1× 3.3kW = 10
+                                    Ports):</span><strong class="text-slate-900">₹1,85,000</strong></div>
+                            <div class="flex justify-between"><span>3-Phase LT Metering, Cabling &amp;
+                                    Earthing:</span><strong class="text-slate-900">₹65,000</strong></div>
+                            <div class="flex justify-between"><span>Canopy, Bay Marking &amp; OCPP 4G
+                                    Router:</span><strong class="text-slate-900">₹70,000</strong></div>
+                            <div
+                                class="flex justify-between bg-emerald-50 p-2 rounded-lg border border-emerald-200 font-bold text-slate-900">
+                                <span>Total Turnkey CAPEX:</span><span class="text-emerald-700">₹3,20,000</span>
+                            </div>
+                            <div class="flex justify-between pt-1"><span>Base Utilization (18% = 142.6
+                                    kWh/day):</span><strong>4,276.8 kWh/mo</strong></div>
+                            <div class="flex justify-between"><span>Monthly Gross Revenue (@
+                                    ₹13.50/kWh):</span><strong>₹57,737 / mo</strong></div>
+                            <div class="flex justify-between"><span>Monthly Total OPEX (MSEDCL ₹7.80 + ₹13.45k
+                                    Fixed):</span><strong>₹46,809 / mo</strong></div>
+                        </div>
+                    </div>
+                    <div class="mt-5 pt-3 border-t border-slate-200 flex items-center justify-between">
+                        <div>
+                            <div class="text-[11px] text-slate-500 font-semibold">Net Profit (EBITDA)</div>
+                            <div class="text-base font-extrabold text-emerald-700">₹10,928/mo <span
+                                    class="text-xs font-normal text-slate-500">(₹1.31L/yr)</span></div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-[11px] text-slate-500 font-semibold">Payback &amp; ROI</div>
+                            <div class="text-sm font-extrabold text-slate-900">29.3 Mo • <span
+                                    class="text-emerald-600">41.0% ROI</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tier 2 Card -->
+                <div
+                    class="bg-slate-50 rounded-2xl p-6 border-2 border-blue-500/80 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800">
+                                Tier-2 • Malls, Hotels &amp; Hospitals
+                            </span>
+                            <span class="text-xs font-bold text-slate-500">70 kW LT/HT Load</span>
+                        </div>
+                        <h3 class="text-lg font-extrabold text-slate-900">Urban Commercial 60 kW DC + 10 kW AC Hub</h3>
+                        <p class="text-xs text-slate-500 mt-1 mb-4">
+                            <strong>Target Zones:</strong> Tarabai Park, Shahupuri, Kawala Naka / Hotel Sayaji, Reliance
+                            Mall Laxmipuri, Private Hospitals (58.97% survey demand).
+                        </p>
+                        <div class="space-y-2 text-xs border-t border-slate-200 pt-3">
+                            <div class="flex justify-between"><span>Hardware (60 kW Dual CCS2 DC + 10 kW
+                                    AC001):</span><strong class="text-slate-900">₹8,20,000</strong></div>
+                            <div class="flex justify-between"><span>Feeder Upgrade, Armored Cable &amp;
+                                    Earthing:</span><strong class="text-slate-900">₹2,40,000</strong></div>
+                            <div class="flex justify-between"><span>Plinth, Bollards, Canopy &amp; OCPP
+                                    CMS:</span><strong class="text-slate-900">₹1,40,000</strong></div>
+                            <div
+                                class="flex justify-between bg-blue-50 p-2 rounded-lg border border-blue-200 font-bold text-slate-900">
+                                <span>Total Turnkey CAPEX:</span><span class="text-blue-700">₹12,00,000</span>
+                            </div>
+                            <div class="flex justify-between pt-1"><span>Base Utilization (14% = 235.2
+                                    kWh/day):</span><strong>7,056.0 kWh/mo</strong></div>
+                            <div class="flex justify-between"><span>Monthly Gross Revenue (@
+                                    ₹18.50/kWh):</span><strong>₹1,30,536 / mo</strong></div>
+                            <div class="flex justify-between"><span>Monthly Total OPEX (MSEDCL ₹8.10 + ₹28.5k
+                                    Fixed):</span><strong>₹85,654 / mo</strong></div>
+                        </div>
+                    </div>
+                    <div class="mt-5 pt-3 border-t border-slate-200 flex items-center justify-between">
+                        <div>
+                            <div class="text-[11px] text-slate-500 font-semibold">Net Profit (EBITDA)</div>
+                            <div class="text-base font-extrabold text-blue-700">₹44,882/mo <span
+                                    class="text-xs font-normal text-slate-500">(₹5.39L/yr)</span></div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-[11px] text-slate-500 font-semibold">Payback &amp; ROI</div>
+                            <div class="text-sm font-extrabold text-slate-900">26.7 Mo • <span
+                                    class="text-blue-600">44.9% ROI</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tier 3 Card -->
+                <div
+                    class="bg-slate-50 rounded-2xl p-6 border-2 border-purple-500/80 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span
+                                class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800">
+                                Tier-3 • NH-48 Intercity &amp; MIDC Fleet
+                            </span>
+                            <span class="text-xs font-bold text-slate-500">180 kW HT Load</span>
+                        </div>
+                        <h3 class="text-lg font-extrabold text-slate-900">NH-48 Highway 120 kW + 60 kW Ultra-Fast Hub
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-1 mb-4">
+                            <strong>Target Zones:</strong> Shiroli MIDC, Gokul Shirgaon, Sarnobatwadi, Kagal, Vadgaon
+                            Food Malls &amp; Intercity Transit Corridors (51.28% survey demand).
+                        </p>
+                        <div class="space-y-2 text-xs border-t border-slate-200 pt-3">
+                            <div class="flex justify-between"><span>Hardware (120 kW + 60 kW Dual CCS2 = 4
+                                    Guns):</span><strong class="text-slate-900">₹19,50,000</strong></div>
+                            <div class="flex justify-between"><span>Dedicated 200 kVA Transformer &amp; HT
+                                    Bay:</span><strong class="text-slate-900">₹6,80,000</strong></div>
+                            <div class="flex justify-between"><span>Drive-Thru Canopy, CCTV &amp; Load
+                                    CMS:</span><strong class="text-slate-900">₹2,90,000</strong></div>
+                            <div
+                                class="flex justify-between bg-purple-50 p-2 rounded-lg border border-purple-200 font-bold text-slate-900">
+                                <span>Total Turnkey CAPEX:</span><span class="text-purple-700">₹29,20,000</span>
+                            </div>
+                            <div class="flex justify-between pt-1"><span>Base Utilization (12% = 518.4
+                                    kWh/day):</span><strong>15,552.0 kWh/mo</strong></div>
+                            <div class="flex justify-between"><span>Monthly Gross Revenue (@
+                                    ₹21.00/kWh):</span><strong>₹3,26,592 / mo</strong></div>
+                            <div class="flex justify-between"><span>Monthly Total OPEX (MSEDCL ₹8.30 + ₹62.0k
+                                    Fixed):</span><strong>₹1,91,082 / mo</strong></div>
+                        </div>
+                    </div>
+                    <div class="mt-5 pt-3 border-t border-slate-200 flex items-center justify-between">
+                        <div>
+                            <div class="text-[11px] text-slate-500 font-semibold">Net Profit (EBITDA)</div>
+                            <div class="text-base font-extrabold text-purple-700">₹1,35,510/mo <span
+                                    class="text-xs font-normal text-slate-500">(₹16.26L/yr)</span></div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-[11px] text-slate-500 font-semibold">Payback &amp; ROI</div>
+                            <div class="text-sm font-extrabold text-slate-900">21.5 Mo • <span
+                                    class="text-purple-600">55.7% ROI</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Live ROI, Breakeven & Cash-Flow Simulator -->
+            <div class="bg-slate-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl border border-slate-800 mb-10">
+                <div
+                    class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-800 pb-5 mb-6">
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-amber-400">Interactive Financial
+                            &amp; Engineering Calculator</span>
+                        <h3 class="text-xl sm:text-2xl font-extrabold mt-0.5">Live Kolhapur EV Station ROI &amp; 5-Year
+                            Cash-Flow Simulator</h3>
+                        <p class="text-xs text-slate-400 mt-1">
+                            Select a preset Kolhapur deployment tier or adjust the sliders to calculate real-time CAPEX
+                            recovery, monthly EBITDA, and breakeven utilization.
+                        </p>
+                    </div>
+                    <div class="flex flex-wrap gap-2 shrink-0">
+                        <button onclick="loadBizPreset(1)"
+                            class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs px-3.5 py-2 rounded-xl transition">
+                            Preset 1: 33 kW 2W Micro-Hub
+                        </button>
+                        <button onclick="loadBizPreset(2)"
+                            class="bg-blue-500 hover:bg-blue-400 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition">
+                            Preset 2: 70 kW Urban Hybrid
+                        </button>
+                        <button onclick="loadBizPreset(3)"
+                            class="bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition">
+                            Preset 3: 180 kW NH-48 Hub
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                    <!-- Left 5 Cols: Sliders -->
+                    <div class="lg:col-span-5 space-y-4 text-xs">
+                        <div>
+                            <div class="flex justify-between font-semibold mb-1">
+                                <span class="text-slate-300">Installed Station Capacity (kW):</span>
+                                <span id="lblBizKw" class="text-emerald-400 font-bold">70 kW</span>
+                            </div>
+                            <input id="simKw" type="range" min="10" max="360" step="5" value="70"
+                                class="w-full accent-emerald-500 cursor-pointer" oninput="updateBizSimulator()" />
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between font-semibold mb-1">
+                                <span class="text-slate-300">Total Turnkey CAPEX (₹):</span>
+                                <span id="lblBizCapex" class="text-emerald-400 font-bold">₹12,00,000</span>
+                            </div>
+                            <input id="simCapex" type="range" min="150000" max="5000000" step="50000" value="1200000"
+                                class="w-full accent-emerald-500 cursor-pointer" oninput="updateBizSimulator()" />
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between font-semibold mb-1">
+                                <span class="text-slate-300">Average Daily Utilization (% of 24h):</span>
+                                <span id="lblBizUtil" class="text-amber-400 font-bold">14.0% (3.36 hrs/day)</span>
+                            </div>
+                            <input id="simUtil" type="range" min="4" max="35" step="0.5" value="14"
+                                class="w-full accent-amber-500 cursor-pointer" oninput="updateBizSimulator()" />
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <div class="flex justify-between font-semibold mb-1">
+                                    <span class="text-slate-300">Customer Tariff:</span>
+                                    <span id="lblBizTariff" class="text-blue-400 font-bold">₹18.50/kWh</span>
+                                </div>
+                                <input id="simTariff" type="range" min="11" max="26" step="0.5" value="18.5"
+                                    class="w-full accent-blue-500 cursor-pointer" oninput="updateBizSimulator()" />
+                            </div>
+                            <div>
+                                <div class="flex justify-between font-semibold mb-1">
+                                    <span class="text-slate-300">MSEDCL Energy Cost:</span>
+                                    <span id="lblBizCost" class="text-rose-400 font-bold">₹8.10/kWh</span>
+                                </div>
+                                <input id="simCost" type="range" min="6.5" max="12" step="0.1" value="8.1"
+                                    class="w-full accent-rose-500 cursor-pointer" oninput="updateBizSimulator()" />
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between font-semibold mb-1">
+                                <span class="text-slate-300">Monthly Fixed OPEX (Demand + Rent + AMC):</span>
+                                <span id="lblBizFixed" class="text-rose-400 font-bold">₹28,500 / mo</span>
+                            </div>
+                            <input id="simFixed" type="range" min="5000" max="90000" step="500" value="28500"
+                                class="w-full accent-rose-500 cursor-pointer" oninput="updateBizSimulator()" />
+                        </div>
+                    </div>
+
+                    <!-- Right 7 Cols: Dynamic Outputs + 5-Year Cumulative Cash-Flow Chart -->
+                    <div class="lg:col-span-7 space-y-5">
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            <div class="bg-slate-800 p-3.5 rounded-2xl border border-slate-700">
+                                <div class="text-[11px] text-slate-400">Monthly Energy Sold</div>
+                                <div id="outBizKwh" class="text-lg font-extrabold text-white mt-0.5">7,056 kWh</div>
+                                <div id="outBizDailyKwh" class="text-[10px] text-slate-400">235.2 kWh / day</div>
+                            </div>
+                            <div class="bg-slate-800 p-3.5 rounded-2xl border border-slate-700">
+                                <div class="text-[11px] text-slate-400">Monthly Net EBITDA</div>
+                                <div id="outBizEbitda" class="text-lg font-extrabold text-emerald-400 mt-0.5">₹44,882
+                                </div>
+                                <div id="outBizGross" class="text-[10px] text-slate-400">Gross: ₹1,30,536/mo</div>
+                            </div>
+                            <div class="bg-slate-800 p-3.5 rounded-2xl border border-slate-700">
+                                <div class="text-[11px] text-slate-400">Payback Period</div>
+                                <div id="outBizPayback" class="text-lg font-extrabold text-amber-400 mt-0.5">26.7 Mo
+                                </div>
+                                <div id="outBizRoi" class="text-[10px] text-emerald-300 font-semibold">Annual ROI: 44.9%
+                                </div>
+                            </div>
+                            <div class="bg-slate-800 p-3.5 rounded-2xl border border-slate-700">
+                                <div class="text-[11px] text-slate-400">Breakeven Utilization</div>
+                                <div id="outBizBreakeven" class="text-lg font-extrabold text-blue-400 mt-0.5">5.44%
+                                </div>
+                                <div id="outBizBeKwh" class="text-[10px] text-slate-400">2,740 kWh / mo</div>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-800/80 p-4 rounded-2xl border border-slate-700">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-300">5-Year Cumulative
+                                    Net Cash-Flow Trajectory (₹ Lakhs) &amp; Tier ROI Comparison</h4>
+                                <span class="text-[11px] text-emerald-400 font-semibold">Updates Live with
+                                    Sliders</span>
+                            </div>
+                            <div class="h-52">
+                                <canvas id="bizCashflowChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- B2B Partnership Revenue-Share Models & 5-Stage Kolhapur Execution Workflow -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- Left 6 Cols: 3 B2B Commercial Partnership Models -->
+                <div class="lg:col-span-6 space-y-4">
+                    <h3 class="text-lg font-extrabold text-slate-900">B2B Partnership &amp; Landowner Revenue Models
+                    </h3>
+                    <div class="space-y-3 text-xs">
+                        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                            <div class="flex items-center justify-between font-bold text-slate-900 text-sm mb-1">
+                                <span>Model A: 100% CPO Capex + Landowner Revenue Share</span>
+                                <span
+                                    class="text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full text-[11px]">Zero
+                                    Host CAPEX</span>
+                            </div>
+                            <p class="text-slate-600 leading-relaxed">
+                                Ideal for <strong>Colleges (Shivaji Univ, DYP), Malls (Reliance Mall, DYP City Mall),
+                                    and
+                                    Hospitals</strong>. The Charge Point Operator (CPO) invests 100% of hardware &amp;
+                                MSEDCL meter CAPEX and pays the host institution a <strong>₹1.50 to ₹2.50/kWh royalty
+                                    (or 15%–20% net revenue share)</strong> instead of fixed land rent.
+                            </p>
+                        </div>
+
+                        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                            <div class="flex items-center justify-between font-bold text-slate-900 text-sm mb-1">
+                                <span>Model B: Co-Investment / 50:50 Joint Venture</span>
+                                <span class="text-blue-700 bg-blue-100 px-2.5 py-0.5 rounded-full text-[11px]">Fastest
+                                    Payback</span>
+                            </div>
+                            <p class="text-slate-600 leading-relaxed">
+                                Ideal for <strong>NH-48 Highway Food Malls, Hotels (Sayaji, Vrishali, Opal, 7/12), and
+                                    Fuel Stations (BPCL/IOCL/HPCL)</strong>. Property owner funds civil/electrical works
+                                (~30% CAPEX) while CPO supplies charger &amp; CMS software (~70% CAPEX), splitting net
+                                EBITDA <strong>50:50</strong>.
+                            </p>
+                        </div>
+
+                        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                            <div class="flex items-center justify-between font-bold text-slate-900 text-sm mb-1">
+                                <span>Model C: 100% Host / Franchisee Owned (White-Label SaaS)</span>
+                                <span class="text-purple-700 bg-purple-100 px-2.5 py-0.5 rounded-full text-[11px]">100%
+                                    Host Profit</span>
+                            </div>
+                            <p class="text-slate-600 leading-relaxed">
+                                Ideal for <strong>Auto Dealerships (Shiroli MIDC, Kawala Naka), Co-op Housing Societies,
+                                    and Fleet Operators</strong>. Host purchases the charger outright and pays only a
+                                <strong>5%–8% OCPP CMS software fee</strong> for UPI QR billing, real-time app
+                                discovery, and remote diagnostics.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right 6 Cols: 5-Step Kolhapur Installation & Regulatory Blueprint -->
+                <div class="lg:col-span-6 space-y-4">
+                    <h3 class="text-lg font-extrabold text-slate-900">5-Stage Installation &amp; Compliance Blueprint in
+                        Kolhapur</h3>
+                    <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3.5 text-xs">
+                        <div class="flex items-start gap-3">
+                            <span
+                                class="w-6 h-6 rounded-full bg-slate-900 text-emerald-400 font-bold flex items-center justify-center shrink-0">1</span>
+                            <div>
+                                <strong class="text-slate-900">GIS Site Selection &amp; Load Feasibility (Week
+                                    1):</strong>
+                                Select high-footfall locations inside our 4 GIS Charging Deserts (Shivaji Peth,
+                                Laxmipuri, Shivaji Univ) or NH-48 interchanges. Verify 24×7 public ingress/egress
+                                (demanded by <strong>76.92%</strong> of surveyed citizens).
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <span
+                                class="w-6 h-6 rounded-full bg-slate-900 text-emerald-400 font-bold flex items-center justify-center shrink-0">2</span>
+                            <div>
+                                <strong class="text-slate-900">MSEDCL Dedicated EV Tariff Connection (Weeks
+                                    2–3):</strong>
+                                Apply via MSEDCL Mahavitaran portal for a dedicated commercial EV charging meter (LT
+                                supply up to 50–100 kW; HT 11 kV substation + 200 kVA transformer for 180+ kW hubs).
+                                Avail Maharashtra EV Policy tariff concessions.
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <span
+                                class="w-6 h-6 rounded-full bg-slate-900 text-emerald-400 font-bold flex items-center justify-center shrink-0">3</span>
+                            <div>
+                                <strong class="text-slate-900">ARAI / BIS Hardware &amp; Civil Works (Weeks
+                                    4–5):</strong>
+                                Install ARAI-certified Bharat AC001 / Type-2 sockets for 2W hubs or CCS2 DC fast
+                                chargers with IP54 weather protection, dedicated copper earthing pits, wheel stops, and
+                                rain canopies.
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <span
+                                class="w-6 h-6 rounded-full bg-slate-900 text-emerald-400 font-bold flex items-center justify-center shrink-0">4</span>
+                            <div>
+                                <strong class="text-slate-900">OCPP 1.6J / OCPI Live App &amp; UPI QR Integration (Week
+                                    6):</strong>
+                                Connect chargers via dual-SIM 4G IoT routers to OCPP 1.6J CMS so live connector status
+                                broadcasts on Statiq, ChargeZone, PowerUpEV, and Google Maps—solving the
+                                <strong>51.28%</strong> citizen demand for real-time availability and
+                                <strong>43.59%</strong> demand for easy UPI payment.
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <span
+                                class="w-6 h-6 rounded-full bg-slate-900 text-emerald-400 font-bold flex items-center justify-center shrink-0">5</span>
+                            <div>
+                                <strong class="text-slate-900">98% Uptime AMC &amp; BEE Registry Listing
+                                    (Ongoing):</strong>
+                                Enforce a 24-hour repair SLA with local electrical engineers in Kolhapur to prevent the
+                                <strong>25% connector fault rate</strong> observed in our technical audit (Hotel 7/12
+                                &amp; Solanki &amp; Sons), and register exact coordinates on the BEE India national
+                                portal.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 7: Policy Roadmap & Final Ideal Conclusion -->
+    <section id="roadmap" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 mb-12">
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-6">6. GIS-Informed Policy Roadmap for Kolhapur
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div
+                class="bg-white p-6 rounded-2xl shadow-sm border-t-4 border-emerald-500 border-x border-b border-slate-200">
+                <div class="text-xs font-bold uppercase text-emerald-600 mb-1">GIS Priority 1 • Western Ward Deserts
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">Micro-Hubs in Old City Peths &amp; Campus</h3>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                    Install 3.3 kW Bharat AC001 / Type-2 2W charging clusters in the 4 GIS-identified charging deserts:
+                    <strong>Shivaji Peth/Rankala parking, Mangalwar Peth, Laxmipuri Market, and Shivaji University
+                        hostels/departments</strong> (backed by <strong>74.36%</strong> citizen demand for
+                    colleges/offices).
+                </p>
+            </div>
+            <div
+                class="bg-white p-6 rounded-2xl shadow-sm border-t-4 border-rose-500 border-x border-b border-slate-200">
+                <div class="text-xs font-bold uppercase text-rose-600 mb-1">GIS Priority 2 • Reverification &amp; Uptime
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">Resolve Aliases &amp; Restore Faulted Hubs</h3>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                    Restore the <strong>4 faulted 120 kW CCS2 connectors</strong> at <em>Hotel 7/12</em> and
+                    <em>Solanki &amp; Sons EV</em>, verify live status at <strong>#47 MSEDCL Shenda Park</strong>, and
+                    reconcile showroom/corridor aliases (<strong>DYP Mall E-Fill/Vijaya Power, MAI Hyundai 30 vs 120
+                        kW</strong>) before claiming capacity.
+                </p>
+            </div>
+            <div
+                class="bg-white p-6 rounded-2xl shadow-sm border-t-4 border-blue-600 border-x border-b border-slate-200">
+                <div class="text-xs font-bold uppercase text-blue-600 mb-1">GIS Priority 3 • Transit Electrification
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">MSRTC 12-Depot HT Grid Upgrades</h3>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                    Prepare dedicated high-voltage substations across MSRTC's <strong>12 depots (892 fleet
+                        buses)</strong> and KMC terminals to support the <strong>100 sanctioned PM-eBus Sewa electric
+                        buses</strong>.
+                </p>
+            </div>
+        </div>
+
+        <!-- Ideal Overall Project Conclusion -->
+        <div class="mt-10 bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200">
+            <div
+                class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold uppercase tracking-wider mb-3">
+                <i data-lucide="check-circle-2" class="w-4 h-4"></i> Final Project Conclusion (Rechecked 26 Oct 2026)
+            </div>
+            <h3 class="text-xl sm:text-2xl font-extrabold text-slate-900 mb-3">
+                7. Overall Conclusion: Triangulating Official RTO Statistics, 47-Site + 37-Lead GIS Audits, Citizen
+                Voice &amp; Commercial Viability
+            </h3>
+            <p class="text-sm text-slate-600 leading-relaxed mb-5">
+                By synthesizing official <strong>Maharashtra Transport Department RTO statistics (60,246 new MH-09
+                    registrations and 1,842,263 total vehicles; 19,748 Ichalkaranji MH-51 registrations; 204,486
+                    Kolhapur Region registrations; and 15,044 reported district EVs in FY 2024–25, up +45.89%
+                    YoY)</strong>, a <strong>47-station Master Directory + 27 ChargeDekho leads (L01–L27) + 10 Showroom
+                    &amp; Hotel Sayaji corridor leads (N01–N10)</strong>, <strong>35 FAME-II scheme benchmarks</strong>,
+                <strong>39 verified citizen survey responses</strong>, and our <strong>3-Tier Commercial ROI
+                    Model</strong>, this project establishes four conclusive findings:
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm text-slate-600">
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <strong class="text-slate-900 block mb-1">1. The Vehicle-to-Charger Inversion (96.91% 2W vs. 19.15%
+                        2W Stations):</strong>
+                    Electric two-wheelers account for <strong>96.91% (14,579 of 15,044)</strong> of Kolhapur’s EV
+                    registrations and <strong>89.74% (35 of 39)</strong> of surveyed users, yet <strong>72.34% (34 of
+                        47)</strong> of Master Directory stations—and virtually all newly discovered highway and
+                    dealership DC fast-charger leads—target 4-wheeler cars, forcing <strong>79.49%</strong> of citizens
+                    to rely solely on home charging.
+                </div>
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <strong class="text-slate-900 block mb-1">2. Spatial Inequality &amp; Coordinate Verification
+                        Rigour:</strong>
+                    Only <strong>8 of 47 Master stations</strong> possess exact published registry coordinates (BEE
+                    India, Open Charge Map, evgoo—including newly added <strong>#47 PowerUP / MSEDCL Shenda Park
+                        Substation</strong> at $16.67417^\circ\text{N}, 74.237358^\circ\text{E}$), while eastern NH-48
+                    and Kawala Naka/Sayaji corridor clustering leaves western residential wards and campuses unserved.
+                    Consequently, <strong>76.92%</strong> of citizens find locating a charger <em>Difficult/Very
+                        Difficult</em>.
+                </div>
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <strong class="text-slate-900 block mb-1">3. Directory Inflation, Alias Duplication &amp; Uptime
+                        Deficits:</strong>
+                    Our <strong>Showroom &amp; Sayaji Corridor Recheck (N01–N10)</strong> proves why raw aggregator
+                    totals (38 to 105 points) cannot be taken at face value: multiple listings refer to the same
+                    physical site (e.g., <strong>E-Fill N01 &amp; Vijaya Power N02 at DYP City Mall</strong>), report
+                    conflicting ratings (<strong>MAI Hyundai N03: 30 kW vs. 120 kW</strong>), or misclassify auto
+                    dealerships without public chargers (<strong>Mohite Suzuki N06</strong>). Combined with a
+                    <strong>25% connector fault rate</strong> among audited fast chargers and unavailable status on
+                    Statiq ID 9184 for <strong>MSEDCL Shenda Park</strong>, this directly explains why
+                    <strong>66.67%</strong> of surveyed citizens report queues, unavailable guns, or poor maintenance.
+                </div>
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <strong class="text-slate-900 block mb-1">4. Commercial Viability &amp; 100% Citizen
+                        Consensus:</strong>
+                    Every surveyed citizen (<strong>100% — 56.41% Definitely, 43.59% Probably</strong>) confirmed that
+                    better charging infrastructure will accelerate EV switching. Our financial engineering model proves
+                    that deploying <strong>Tier-1 2W Campus/Ward Micro-Hubs (₹3.20L CAPEX, 41.0% ROI, 9.93% breakeven
+                        utilization)</strong>, <strong>Tier-2 Urban Hybrid Hubs (₹12.00L CAPEX, 44.9% ROI)</strong>, and
+                    <strong>Tier-3 NH-48 Ultra-Fast Hubs (₹29.20L CAPEX, 55.7% ROI)</strong> achieves full payback in
+                    <strong>21.5 to 29.3 months</strong>—making Kolhapur’s EV transition both socially urgent and
+                    commercially bankable.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        lucide.createIcons();
+
+        // Updated 47-Station Master Dataset (Including Record #47 PowerUP / MSEDCL Shenda Park & 8 Exact Published BEE/OCM Coordinates)
+        const masterStations = [
+            { id: 1, name: "MG Motor - Electric Charging Station", area: "Shiroli MIDC", scope: "District", op: "MG / OEM", vehicle: "Car", specs: "CHAdeMO; CCS-I | Not stated | 2 DC slots", status: "Directory listing; live state unverified", verify: "Medium", lat: 16.7485, lon: 74.2776, exactCoord: false, coordNote: "Pending exact-location verification — locality pin", gmaps: "https://www.google.com/maps/search/?api=1&query=MG+Motor+-+Electric+Charging+Station%2C+MG+Motor+Kolhapur%2C+Service+Road%2C+MIDC%2C+Shiroli%2C+Kolhapur%2C+Kolhapur%2C+Maharashtra" },
+            { id: 2, name: "McDonald's - Charging Station", area: "Sarnobatwadi", scope: "District", op: "Network listing", vehicle: "Car", specs: "CCS-II | Not stated | 1 slot", status: "Directory listing; live state unverified", verify: "Medium", lat: 16.6818, lon: 74.2724, exactCoord: false, coordNote: "Pending exact-location verification — locality pin", gmaps: "https://www.google.com/maps/search/?api=1&query=McDonald%27s+-+Charging+Station%2C+Shop+No+1C%2C+Hissa+No+1%2C+Plot+No+1%2FK1%2C+next+to+Klin+Fuel+Technology%2C+Sarnobatwadi%2C+Kolhapur%2C+Kolhapur%2C+Maharashtra" },
+            { id: 3, name: "Tata Power - Unique Automobiles Charging Station", area: "MIDC Shiroli", scope: "District", op: "Tata Power", vehicle: "Car", specs: "CCS-II; AC Type 2 | Not stated | 2 slots (24h)", status: "Directory listing; live state unverified", verify: "High", lat: 16.7453, lon: 74.2773, exactCoord: false, coordNote: "Pending exact-location verification — locality pin", gmaps: "https://www.google.com/maps/search/?api=1&query=Tata+Power+-+Unique+Automobiles+Charging+Station%2C+S.No.+592%2C+H.No.+4481%2C+1st+Stop%2C+MIDC+Shiroli+%28P%29%2C+Tal-Hatkanangale%2C+Kolhapur%2C+Maharashtra" },
+            { id: 4, name: "TML - Unity Motors Charging Station", area: "Gokul Shirgaon", scope: "District", op: "Tata / Unity Motors", vehicle: "Car", specs: "CCS-II; CHAdeMO; AC Type 2 | Not stated | 1+ slot (24h)", status: "Directory listing; live state unverified", verify: "High", lat: 16.6414, lon: 74.2783, exactCoord: false, coordNote: "Pending exact-location verification — locality pin", gmaps: "https://www.google.com/maps/search/?api=1&query=TML+-+Unity+Motors+Charging+Station%2C+Plot+No.+170%2F176%2C+Gokul+Shirgaon%2C+Pune-Bangalore+Highway%2C+NH-4%2C+Kolhapur%2C+Maharashtra" },
+            { id: 5, name: "IOCL - Jyotirling Charging Station", area: "Panhala / Giroli-Karanjivane", scope: "District", op: "IndianOil", vehicle: "Car", specs: "Bharat AC001; AC Type 2 | Not stated | 2 slots", status: "Directory listing; live state unverified", verify: "Medium", lat: 16.80038, lon: 74.19902, exactCoord: true, coordNote: "Published coordinates — evgoo / BEE-OCM-derived IOCL record; Giroli/Panhala", gmaps: "https://www.google.com/maps/search/?api=1&query=IOCL+-+Jyotirling+Charging+Station%2C+Ground+Floor%2C+Panhala%2C+Giroli+Karanjivane%2C+Kolhapur%2C+Maharashtra" },
+            { id: 6, name: "IOCL - Praveen Auto Centre Charging Station", area: "Ujalaiwadi", scope: "City fringe", op: "IndianOil", vehicle: "Car", specs: "Bharat AC001; AC Type 2 | Not stated | 2 slots (24h)", status: "Directory listing; live state unverified", verify: "High", lat: 16.66437, lon: 74.26713, exactCoord: true, coordNote: "Published coordinates — evgoo / BEE-OCM-derived IOCL record; Ujalaiwadi NH-4", gmaps: "https://www.google.com/maps/search/?api=1&query=IOCL+-+Praveen+Auto+Centre+Charging+Station%2C+Near+Shivaji+University+NH+4%2C+Karveer+Ujalaiwadi%2C+Kolhapur%2C+Maharashtra" },
+            { id: 7, name: "IOCL - Sai Auto Service Charging Station", area: "Gadhinglaj", scope: "District", op: "IndianOil", vehicle: "Car", specs: "Bharat AC001; AC Type 2 | Not stated | 2 slots (24h)", status: "Directory listing; live state unverified", verify: "Medium", lat: 16.22924, lon: 74.35732, exactCoord: true, coordNote: "Published coordinates — evgoo / BEE-OCM-derived IOCL record; Gadhinglaj", gmaps: "https://www.google.com/maps/search/?api=1&query=IOCL+-+Sai+Auto+Service+Charging+Station%2C+Ajara+Sankeshwar+Road%2C+Gadhinglaj%2C+Kolhapur%2C+Maharashtra" },
+            { id: 8, name: "Kini Highschool Charging Station", area: "Kini / Hatkanangle", scope: "District", op: "UTPL / directory listing", vehicle: "Car", specs: "CCS-II | Not stated | 1 slot", status: "Directory listing; live state unverified", verify: "Medium", lat: 16.8339, lon: 74.2669, exactCoord: false, coordNote: "Pending exact-location verification — locality pin", gmaps: "https://www.google.com/maps/search/?api=1&query=Kini+Highschool+Charging+Station%2C+Kini+Highschool%2C+Hatkanangle%2C+Kolhapur%2C+Maharashtra" },
+            { id: 9, name: "E-Fill - DYP City Mall Charging Station", area: "Kawala Naka / Shahupuri", scope: "City", op: "E-Fill / Statiq", vehicle: "Car", specs: "CCS2 | 120 kW DC + 60 kW DC | 4 CCS2 (2+2)", status: "Connectors shown available in reviewed Statiq snapshot", verify: "High", lat: 16.703369, lon: 74.250457, exactCoord: true, coordNote: "Published station coordinates — Open Charge Map (DYP City Mall)", gmaps: "https://www.google.com/maps/search/?api=1&query=E-Fill+-+DYP+City+Mall+Charging+Station%2C+Old+Pune-Bangalore+Hwy%2C+Kawala+Naka%2C+Shahupuri%2C+Kolhapur%2C+Kolhapur%2C+Maharashtra" },
+            { id: 10, name: "Kazam - Rajhans Deluxe Charging Station", area: "C Ward / Bindu Chowk", scope: "City", op: "Kazam", vehicle: "Car/3W/2W", specs: "Bharat AC001 | Not stated | 1 slot (24h)", status: "Directory listing; live state unverified", verify: "Medium", lat: 16.6958, lon: 74.2243, exactCoord: false, coordNote: "Pending exact-location verification — locality pin", gmaps: "https://www.google.com/maps/search/?api=1&query=Kazam+-+Rajhans+Deluxe+Charging+Station%2C+528-527+C+Ward%2C+Rajaram+Road%2C+Bindu+Chowk%2C+Kolhapur%2C+Maharashtra" },
+            { id: 11, name: "Kazam - Rajarampuri Charging Station", area: "Rajarampuri", scope: "City", op: "Kazam", vehicle: "Car/3W/2W", specs: "Bharat AC001 | Not stated | '23 slots' listed; verify", status: "Directory listing; capacity field needs verification", verify: "Medium", lat: 16.6944, lon: 74.2427, exactCoord: false, coordNote: "Pending exact-location verification — locality pin", gmaps: "https://www.google.com/maps/search/?api=1&query=Kazam+-+Rajarampuri+Charging+Station%2C+Shahu+Mill+Road%2C+Poorvarang%2C+Mahalaxminagar%2C+Kolhapur%2C+Maharashtra" },
+            { id: 12, name: "E-Fill - Hotel Minerva Paradise (Private - Charger)", area: "Ajara", scope: "District", op: "E-Fill", vehicle: "Car", specs: "CCS-II | Not stated | 1 slot", status: "Private charger; public availability unconfirmed", verify: "Medium", lat: 16.1173, lon: 74.2095, exactCoord: false, coordNote: "Pending exact-location verification — locality pin", gmaps: "https://www.google.com/maps/search/?api=1&query=E-Fill+-+Hotel+Minerva+Paradise+%28Private+-+Charger%29%2C+Amboli+Road%2C+Opp.+New+Court+Building%2C+Ajara%2C+Kolhapur%2C+Maharashtra" },
+            { id: 13, name: "UTPL - EV Charging Station", area: "New Shahupuri / Railway", scope: "City", op: "UTPL", vehicle: "Car", specs: "Not stated | '23 slots' listed; verify", status: "Directory listing; live state unverified", verify: "Low/Medium", lat: 16.7028, lon: 74.2390, exactCoord: false, coordNote: "Pending exact-location verification — locality pin", gmaps: "https://www.google.com/maps/search/?api=1&query=UTPL+-+EV+Charging+Station%2C+Railway+Colony+Road%2C+New+Shahupuri%2C+Kolhapur%2C+Kolhapur%2C+Maharashtra" },
+            { id: 14, name: "UTPL - EV Charging Station", area: "Rajarampuri", scope: "City", op: "UTPL", vehicle: "Car", specs: "Not stated | '23 slots' listed; verify", status: "Directory listing; live state unverified", verify: "Low/Medium", lat: 16.6929, lon: 74.2441, exactCoord: false, coordNote: "Pending exact-location verification — locality pin", gmaps: "https://www.google.com/maps/search/?api=1&query=UTPL+-+EV+Charging+Station%2C+M6VR+HX6%2C+S.T.+Colony%2C+Mahalaxminagar%2C+Rajarampuri%2C+Kolhapur%2C+Maharashtra" },
+            { id: 15, name: "UTPL - Shri Mahalaxmi Weaving And Spinning Mills", area: "Khotwadi / Ichalkaranji", scope: "District", op: "UTPL", vehicle: "Car / industrial", specs: "Not stated | 1 slot", status: "Directory listing; live state unverified", verify: "Medium", lat: 16.6913, lon: 74.4584, exactCoord: false, coordNote: "Pending exact-location verification — locality pin", gmaps: "https://www.google.com/maps/search/?api=1&query=UTPL+-+Shri+Mahalaxmi+Weaving+And+Spinning+Mills%2C+Plot+24-27%2C+Parvati+Industrial+Estate%2C+Khotwadi%2C+Ichalkaranji%2C+Kolhapur%2C+Maharashtra" },
+            { id: 16, name: "UTPL - EV Charging Station", area: "Warananagar", scope: "District", op: "UTPL", vehicle: "Car", specs: "Not stated | '23 slots' listed; verify", status: "Directory listing; live state unverified", verify: "Low/Medium", lat: 16.8624, lon: 74.2038, exactCoord: false, coordNote: "Pending exact-location verification — locality pin", gmaps: "https://www.google.com/maps/search/?api=1&query=UTPL+-+EV+Charging+Station%2C+V683+5V8%2C+Warananagar%2C+Maharashtra%2C+Kolhapur%2C+Maharashtra" },
+            { id: 17, name: "UTPL - EV Charging Station", area: "Minche", scope: "District", op: "UTPL", vehicle: "Car", specs: "Not stated | '23 slots' listed; verify", status: "Directory listing; live state unverified", verify: "Low/Medium", lat: 16.7884, lon: 74.3316, exactCoord: false, coordNote: "Pending exact-location verification — locality pin", gmaps: "https://www.google.com/maps/search/?api=1&query=UTPL+-+EV+Charging+Station%2C+R8FM+JW9%2C+Minche%2C+Maharashtra%2C+Kolhapur%2C+Maharashtra" },
+            { id: 18, name: "Ather-Space Charging Station", area: "Kawala Naka", scope: "City", op: "Ather", vehicle: "Electric 2W", specs: "Ather connector | 3 kW class | 2 slots", status: "Network-listed; live state not independently verified", verify: "High", lat: 16.7089, lon: 74.2486, exactCoord: false, coordNote: "Pending exact-location verification — locality pin", gmaps: "https://www.google.com/maps/search/?api=1&query=Ather-Space+Charging+Station%2C+C.S.+No.+195K%2F2K%2C+Kavala+Naka%2C+E-Ward%2C+Kolhapur%2C+Maharashtra" },
+            { id: 19, name: "Ather-Akki's Bistro Charging Station", area: "Mohite Park", scope: "City", op: "Ather", vehicle: "Electric 2W", specs: "Ather connector | 3 kW class | 2 slots", status: "Network-listed; live state not independently verified", verify: "High", lat: 16.68569, lon: 74.20842, exactCoord: true, coordNote: "Published coordinates — evgoo / BEE-OCM-derived station record; Mohite Park Ather", gmaps: "https://www.google.com/maps/search/?api=1&query=Ather-Akki%27s+Bistro+Charging+Station%2C+CS+No.+1082%2C+Chandrameela+Building%2C+Near+Krishna+Temple%2C+Mohite+Park%2C+Kolhapur%2C+Maharashtra" },
+            { id: 20, name: "Ather-Unique Automobiles Charging Station", area: "Shiroli", scope: "District", op: "Ather", vehicle: "Electric 2W", specs: "Ather connector | 3 kW class | Not stated", status: "Official network listing; live state unverified", verify: "High", lat: 16.73153, lon: 74.281812, exactCoord: true, coordNote: "Published coordinates — BEE India registry; Ather, 122/1 Pune–Bangalore Hwy", gmaps: "https://www.google.com/maps/search/?api=1&query=Ather-Unique+Automobiles+Charging+Station%2C+122%2F1%2C+Pune-Bangalore+Hwy%2C+Shiroli%2C+Kolhapur%2C+Maharashtra" },
+            { id: 21, name: "Ather-TRZ Ather Sane Guruji Charging Station", area: "Sane Guruji", scope: "City", op: "Ather", vehicle: "Electric 2W", specs: "Ather connector | 3 kW class | 2 slots", status: "Network-listed; live state unverified", verify: "High", lat: 16.6766, lon: 74.2120, exactCoord: false, coordNote: "Pending exact-location verification — locality pin", gmaps: "https://www.google.com/maps/search/?api=1&query=Ather-TRZ+Ather+Sane+Guruji+Charging+Station%2C+Ather+Test+Ride+Zone%2C+near+Prachi+Hotel%2C+Main+Road+Saneguruji%2C+Kolhapur%2C+Maharashtra" },
+            { id: 22, name: "Ather-Unique Automobiles MG Garage Charging Station", area: "MIDC Shiroli", scope: "District", op: "Ather", vehicle: "Electric 2W", specs: "Ather connector | 3 kW class | 2 slots", status: "Official network listing; live state unverified", verify: "High", lat: 16.75272, lon: 74.2782, exactCoord: true, coordNote: "Published coordinates — evgoo / BEE-OCM-derived station record; Ather MIDC Shiroli", gmaps: "https://www.google.com/maps/search/?api=1&query=Ather-Unique+Automobiles+MG+Garage+Charging+Station%2C+MIDC%2C+Shiroli%2C+Kolhapur%2C+Maharashtra" },
+            { id: 23, name: "Morya Food Junction Charging Station", area: "Hatkanangle-Sangli Road", scope: "District", op: "Ather", vehicle: "Electric 2W", specs: "Ather connector | 3 kW class | 2 slots", status: "Network-listed; live state unverified", verify: "High", lat: 16.7811, lon: 74.4206, exactCoord: false, coordNote: "Pending exact-location verification — locality pin", gmaps: "https://www.google.com/maps/search/?api=1&query=Morya+Food+Junction+Charging+Station%2C+Near+Morya+Furniture%2C+Hatkanangle+Sangli+Road%2C+Kolhapur%2C+Maharashtra" },
+            { id: 24, name: "Bijlify - Hotel Rasika (Private - Charger)", area: "Jadhavwadi / Market Yard", scope: "City", op: "Bijlify", vehicle: "Car", specs: "Not stated | 1 slot", status: "Private charger; live state unverified", verify: "Medium", lat: 16.7113, lon: 74.2551, exactCoord: false, coordNote: "Pending exact-location verification — locality pin", gmaps: "https://www.google.com/maps/search/?api=1&query=Bijlify+-+Hotel+Rasika+%28Private+-+Charger%29%2C+R.S.No.+4%2F26%2C+E-Ward%2C+Opp+Shahu+Market+Yard%2C+Jadhavwadi%2C+Kolhapur%2C+Maharashtra" },
+            { id: 25, name: "MG Motor - Electric Charging Station (Alt)", area: "Shiroli MIDC", scope: "District", op: "MG", vehicle: "Car", specs: "CHAdeMO; CCS-I | 2 DC slots", status: "Directory listing; live state unverified", verify: "Medium", lat: 16.7492, lon: 74.2749, exactCoord: false, coordNote: "Pending exact-location verification — locality pin", gmaps: "https://www.google.com/maps/search/?api=1&query=MG+Motor+-+Electric+Charging+Station%2C+MG+Motor+Kolhapur%2C+Service+Road%2C+MIDC%2C+Shiroli%2C+Kolhapur%2C+Maharashtra" },
+            { id: 26, name: "Tata Power - Unique Automobiles Maharashtra Shiroli", area: "MIDC Shiroli", scope: "District", op: "Tata Power", vehicle: "Car", specs: "CCS-II; Bharat AC001; CHAdeMO; AC Type 2 | 2 slots", status: "Likely duplicate/alternate listing of row 03", verify: "High", lat: 16.7482, lon: 74.2795, exactCoord: false, coordNote: "Pending exact-location verification — locality pin", gmaps: "https://www.google.com/maps/search/?api=1&query=Tata+Power+-+Unique+Automobiles+Maharashtra+Shiroli%2C+S.No+592%2C+H.No+4481%2C+1st+Stop+MIDC+Shiroli%2C+Kolhapur%2C+Maharashtra" },
+            { id: 27, name: "McDonald's - Charging Station (Alt)", area: "Sarnobatwadi", scope: "District", op: "Network listing", vehicle: "Car", specs: "CCS-II | 1 slot", status: "Directory listing; live state unverified", verify: "Medium", lat: 16.6826, lon: 74.2734, exactCoord: false, coordNote: "Pending exact-location verification — locality pin", gmaps: "https://www.google.com/maps/search/?api=1&query=McDonald%27s+-+Charging+Station%2C+Shop+No+1C%2C+Hissa+No+1%2C+Plot+No+1%2FK1%2C+next+to+Klin+Fuel+Technology%2C+Sarnobatwadi%2C+Kolhapur%2C+Maharashtra" },
+            { id: 28, name: "HPCL - Lakshmi Anand Charging Station", area: "Pangire", scope: "District", op: "HP / HP eCharge", vehicle: "Car", specs: "Not stated | 1 slot", status: "Directory listing; live state unverified", verify: "Medium", lat: 16.3215, lon: 74.1485, exactCoord: false, coordNote: "Pending exact-location verification — locality pin", gmaps: "https://www.google.com/maps/search/?api=1&query=HPCL+-+Lakshmi+Anand+Charging+Station%2C+76VH+X8X%2C+Pangire+A%2C+Pangire%2C+Kolhapur%2C+Maharashtra" },
+            { id: 29, name: "Kazam - Tarabai Park Charging Station", area: "Tarabai Park", scope: "City", op: "Kazam", vehicle: "Car/3W/2W", specs: "Not stated | 1 slot", status: "Directory listing; live state unverified", verify: "Medium", lat: 16.7099, lon: 74.2404, exactCoord: false, coordNote: "Pending exact-location verification — locality pin", gmaps: "https://www.google.com/maps/search/?api=1&query=Kazam+-+Tarabai+Park+Charging+Station%2C+Tarabai+Park%2C+Kolhapur%2C+Kolhapur%2C+Maharashtra" },
+            { id: 30, name: "Zeon - Kolhapur Railway Station", area: "New Shahupuri / Railway Station", scope: "City", op: "Zeon", vehicle: "Car", specs: "CCS2 | 30 kW DC | 1 CCS2 (24h)", status: "Station listed open; live connector state not captured", verify: "High", lat: 16.7019, lon: 74.2369, exactCoord: false, coordNote: "Pending exact-location verification — locality pin", gmaps: "https://www.google.com/maps/search/?api=1&query=Zeon+-+Kolhapur+Railway+Station%2C+Railway+Station%2C+Railway+Colony+Road%2C+New+Shahupuri%2C+Kolhapur%2C+Maharashtra" },
+            { id: 31, name: "E-Fill - Shahu Market Yard", area: "Shahu Market Yard", scope: "City", op: "E-Fill", vehicle: "Car", specs: "Not independently stated (24h)", status: "Business listing currently open; specs unverified", verify: "Medium", lat: 16.7127, lon: 74.2557, exactCoord: false, coordNote: "Pending exact-location verification — locality pin", gmaps: "https://www.google.com/maps/search/?api=1&query=E-Fill+-+Shahu+Market+Yard%2C+Chandran+Menon+Road%2C+Shahu+Market+Yard%2C+Kolhapur%2C+Maharashtra" },
+            { id: 32, name: "E-Fill - Mane Heights", area: "Sarnobatwadi", scope: "District", op: "E-Fill", vehicle: "Car", specs: "Not independently stated (24h)", status: "Business listing currently open; specs unverified", verify: "Medium", lat: 16.6822, lon: 74.2715, exactCoord: false, coordNote: "Pending exact-location verification — locality pin", gmaps: "https://www.google.com/maps/search/?api=1&query=E-Fill+-+Mane+Heights%2C+Shop+No+1%2C+Ground+Floor%2C+Mane+Heights%2C+NH+Service+Road%2C+Sarnobatwadi%2C+Kolhapur%2C+Maharashtra" },
+            { id: 33, name: "LionCharge Charging Station", area: "Sarnobatwadi", scope: "District", op: "LionCharge", vehicle: "Car / EV", specs: "Not independently stated (24h)", status: "Business listing currently open; specs unverified", verify: "Medium", lat: 16.6802, lon: 74.2722, exactCoord: false, coordNote: "Pending exact-location verification — locality pin", gmaps: "https://www.google.com/maps/search/?api=1&query=LionCharge+Charging+Station%2C+Hissa+No+1%2C+Plot+No+1%2FK1%2C+next+to+McDonald%27s+and+Greecania%2C+Sarnobatwadi%2C+Kolhapur%2C+Maharashtra" },
+            { id: 34, name: "BPCL eDrive - Uchgaon/Mudshingi", area: "Uchgaon / Mudshingi", scope: "District", op: "BPCL eDrive", vehicle: "Car / commercial", specs: "Not independently stated (24h)", status: "Business listing currently open; specs unverified", verify: "Medium", lat: 16.6877, lon: 74.3061, exactCoord: false, coordNote: "Pending exact-location verification — locality pin", gmaps: "https://www.google.com/maps/search/?api=1&query=BPCL+eDrive+-+Uchgaon%2FMudshingi%2C+Gate+No+305%2C+Kolhapur-Hupari+Road%2C+SH115%2C+Uchgaon%2FMudshingi%2C+Kolhapur%2C+Maharashtra" },
+            { id: 35, name: "Mercedes-Benz Charging Station - Nagaon", area: "Nagaon", scope: "District", op: "Mercedes-Benz", vehicle: "Car / OEM", specs: "Not independently stated (24h)", status: "Listed open; rating low; operational state unverified", verify: "Medium", lat: 16.7665, lon: 74.2667, exactCoord: false, coordNote: "Pending exact-location verification — locality pin", gmaps: "https://www.google.com/maps/search/?api=1&query=Mercedes-Benz+Charging+Station+-+Nagaon%2C+Gat+No+489%2FB%2C+Lohar+Lane%2C+near+India+Tiles%2C+Sambhaji+Nagar%2C+Nagaon%2C+Kolhapur%2C+Maharashtra" },
+            { id: 36, name: "Vijaya Power Charging Station - Toap", area: "Toap", scope: "District", op: "Vijaya Power", vehicle: "Car / EV", specs: "Not independently stated (24h)", status: "Business listing currently open; specs unverified", verify: "Medium", lat: 16.7930, lon: 74.2609, exactCoord: false, coordNote: "Pending exact-location verification — locality pin", gmaps: "https://www.google.com/maps/search/?api=1&query=Vijaya+Power+Charging+Station+-+Toap%2C+Toap%2C+Kolhapur%2C+Kolhapur%2C+Maharashtra" },
+            { id: 37, name: "goEgo Charging Station - Tarabai Park", area: "Tarabai Park", scope: "City", op: "goEgo", vehicle: "Electric 2W / 3W", specs: "Not independently stated (24h)", status: "Business listing currently open; specs unverified", verify: "Medium", lat: 16.7092, lon: 74.2431, exactCoord: false, coordNote: "Pending exact-location verification — locality pin", gmaps: "https://www.google.com/maps/search/?api=1&query=goEgo+Charging+Station+-+Tarabai+Park%2C+P66W%2B3CP%2C+Tarabai+Park%2C+Kolhapur%2C+Maharashtra" },
+            { id: 38, name: "Ather Charging Station - Kalamba Road", area: "Kalamba / Survey Nagar", scope: "City", op: "Ather", vehicle: "Electric 2W", specs: "Ather connector | 3 kW class (24h)", status: "Business listing currently open; live state unverified", verify: "High", lat: 16.6667, lon: 74.2189, exactCoord: false, coordNote: "Pending exact-location verification — locality pin", gmaps: "https://www.google.com/maps/search/?api=1&query=Ather+Charging+Station+-+Kalamba+Road%2C+M664%2BF59%2C+Kalamba+Road%2C+Dadu+Chougule+Nagar+%2F+Survey+Nagar%2C+Kolhapur%2C+Maharashtra" },
+            { id: 39, name: "BPCL Charging Station - Shiye", area: "Shiye", scope: "District", op: "BPCL", vehicle: "Car / commercial", specs: "Not independently stated (24h)", status: "Business listing currently open; specs unverified", verify: "Medium", lat: 16.7590, lon: 74.2675, exactCoord: false, coordNote: "Pending exact-location verification — locality pin", gmaps: "https://www.google.com/maps/search/?api=1&query=BPCL+Charging+Station+-+Shiye%2C+Q79C%2BW22%2C+Shiye%2C+Kolhapur%2C+Maharashtra" },
+            { id: 40, name: "BPCL Charging Station - Ajara", area: "Ajara / Munguswadi", scope: "District", op: "BPCL", vehicle: "Car / commercial", specs: "Not independently stated (24h)", status: "Business listing currently open; specs unverified", verify: "Medium", lat: 16.1202, lon: 74.2161, exactCoord: false, coordNote: "Pending exact-location verification — locality pin", gmaps: "https://www.google.com/maps/search/?api=1&query=BPCL+Charging+Station+-+Ajara%2C+Q72H%2BWJQ%2C+Munguswadi%2C+Ajara%2C+Kolhapur%2C+Maharashtra" },
+            { id: 41, name: "BPCL Charging Station - Balinge", area: "Balinge / New Nagadev Wadi", scope: "District", op: "BPCL", vehicle: "Car / commercial", specs: "Not independently stated (24h)", status: "Business listing currently open; specs unverified", verify: "Medium", lat: 16.6963, lon: 74.1785, exactCoord: false, coordNote: "Pending exact-location verification — locality pin", gmaps: "https://www.google.com/maps/search/?api=1&query=BPCL+Charging+Station+-+Balinge%2C+M5VP%2B24M%2C+New+Nagadev+Wadi%2C+Balinge%2C+Kolhapur%2C+Maharashtra" },
+            { id: 42, name: "Tata Power Charging Station - Nagaon", area: "Nagaon / MIDC", scope: "District", op: "Tata Power", vehicle: "Car / commercial", specs: "Not independently stated (24h)", status: "Business listing currently open; specs unverified", verify: "Medium", lat: 16.7643, lon: 74.2666, exactCoord: false, coordNote: "Pending exact-location verification — locality pin", gmaps: "https://www.google.com/maps/search/?api=1&query=Tata+Power+Charging+Station+-+Nagaon%2C+B+01%2C+Service+Road%2C+MIDC%2C+Nagaon%2C+Kolhapur%2C+Maharashtra" },
+            { id: 43, name: "Jio-bp pulse - Shahu Market Yard", area: "Shahu Market Yard", scope: "City", op: "Jio-bp pulse", vehicle: "Car / commercial", specs: "Not independently stated (24h)", status: "Business listing currently open; specs unverified", verify: "Medium", lat: 16.7118, lon: 74.2558, exactCoord: false, coordNote: "Pending exact-location verification — locality pin", gmaps: "https://www.google.com/maps/search/?api=1&query=Jio-bp+pulse+-+Shahu+Market+Yard%2C+CWC+Kolhapur+I%2C+Plot+M-12%2C+Shahu+Market+Yard%2C+Kolhapur%2C+Maharashtra" },
+            { id: 44, name: "EV Plugin Charging Station - Kasaba Bawada", area: "Kasaba Bawada", scope: "City", op: "EV Plugin", vehicle: "Car / EV", specs: "Not independently stated (24h)", status: "Business listing currently open; specs unverified", verify: "Medium", lat: 16.7329, lon: 74.2445, exactCoord: false, coordNote: "Pending exact-location verification — locality pin", gmaps: "https://www.google.com/maps/search/?api=1&query=EV+Plugin+Charging+Station+-+Kasaba+Bawada%2C+Near+Ram+Society+petrol+pump%2C+14%2F1%2C+Main+Road%2C+Kasaba+Bawada%2C+Kolhapur%2C+Maharashtra" },
+            { id: 45, name: "Nikol EV Charging Station - Station Road", area: "New Shahupuri", scope: "City", op: "Nikol", vehicle: "Car / EV", specs: "Not independently stated (24h)", status: "Business listing currently open; specs unverified", verify: "Medium", lat: 16.7052, lon: 74.2400, exactCoord: false, coordNote: "Pending exact-location verification — locality pin", gmaps: "https://www.google.com/maps/search/?api=1&query=Nikol+EV+Charging+Station+-+Station+Road%2C+P63P%2B7P9%2C+Station+Road%2C+New+Shahupuri%2C+Kolhapur%2C+Maharashtra" },
+            { id: 46, name: "Ather Grid - Cafe Miles by Kisan Tyres", area: "Tarabai Park", scope: "City", op: "Ather Grid", vehicle: "Electric 2W", specs: "Ather connector | 3 kW class (24h)", status: "Business listing currently open; live state not independently verified", verify: "High", lat: 16.7096, lon: 74.2421, exactCoord: false, coordNote: "Pending exact-location verification — locality pin", gmaps: "https://www.google.com/maps/search/?api=1&query=Ather+Grid+-+Cafe+Miles+by+Kisan+Tyres%2C+P64W%2BPF2%2C+Cafe+Miles+by+Kisan+Tyres%2C+Tarabai+Park%2C+Kolhapur%2C+Maharashtra" },
+            { id: 47, name: "PowerUP / MSEDCL Go Green Charging Station - Shenda Park Substation", area: "Shenda Park / Datta Colony", scope: "City", op: "MSEDCL / Mahavitaran (PowerUpEV)", vehicle: "EVs; connector compatibility varies", specs: "Bharat DC-001 (15 kW); Combo CCS-II + CHAdeMO (25/50 kW) | 3 points", status: "Added 2026-10-26: Listed; live status NOT confirmed (Statiq ID 9184 shows CCS-2/CHAdeMO unavailable)", verify: "High", lat: 16.67417, lon: 74.237358, exactCoord: true, coordNote: "Published BEE register coordinates (16.674170, 74.237358); confirm bay pin on site", gmaps: "https://www.google.com/maps/search/?api=1&query=PowerUP+MSEDCL+Shenda+Park+Substation+Kolhapur" }
+        ];
+
+        // 27 New Candidate Discovery Leads (Checked 26 October 2026 via ChargeDekho)
+        const candidateLeads = [
+            { id: "L01", name: "ANAND HIGHWAY SERVICES", area: "MIDC Gokul Shirgaon", op: "BPCL HelloBPCL", config: "120 kW DC; CCS2; 2 guns", note: "Reported 24 h; directory reports 97% availability", review: "No exact name match in 46-row master; deduplicate site", lat: 16.6445, lon: 74.2795, gmaps: "https://www.google.com/maps/search/?api=1&query=ANAND+HIGHWAY+SERVICES%2C+MIDC+Gokul+Shirgaon%2C+Kolhapur%2C+Maharashtra%2C+India" },
+            { id: "L02", name: "INDIA AUTOMOBILES", area: "MIDC Shiroli", op: "BPCL HelloBPCL", config: "120 kW DC; CCS2; 2 guns", note: "Reported 24 h; directory reports 86% availability", review: "No exact name match in 46-row master; deduplicate site", lat: 16.7460, lon: 74.2810, gmaps: "https://www.google.com/maps/search/?api=1&query=INDIA+AUTOMOBILES%2C+MIDC+Shiroli%2C+Kolhapur%2C+Maharashtra%2C+India" },
+            { id: "L03", name: "KAGAL PETROL STORES", area: "Kagal", op: "BPCL HelloBPCL", config: "120 kW DC; CCS2; 2 guns", note: "Reported 24 h; directory reports 69% availability", review: "No exact name match in 46-row master; deduplicate site", lat: 16.5770, lon: 74.3150, gmaps: "https://www.google.com/maps/search/?api=1&query=KAGAL+PETROL+STORES%2C+Kagal%2C+Kolhapur%2C+Maharashtra%2C+India" },
+            { id: "L04", name: "Hotel 7/12 Food Mall (ChargeZone)", area: "Vadgaon / Kini area", op: "ChargeZone", config: "120 kW DC; CCS2; 2 guns", note: "Reported 24 h; directory reports 97% availability", review: "Possible overlap/alias — reconcile with existing Hotel 7/12 record", lat: 16.8280, lon: 74.2650, gmaps: "https://www.google.com/maps/search/?api=1&query=Hotel+7%2F12+Food+Mall%2C+Vadgaon+%2F+Kini+area%2C+Kolhapur%2C+Maharashtra%2C+India" },
+            { id: "L05", name: "Vithal Kamat Restaurant Yedenipani (Charge_iN)", area: "Yedenipani / Kameri area", op: "Mahindra / Charge_iN", config: "360 kW DC; CCS2; 4 guns", note: "Reported 24 h; verify district boundary", review: "No exact name match; ultra-fast 360 kW highway hub", lat: 16.9250, lon: 74.2680, gmaps: "https://www.google.com/maps/search/?api=1&query=Vithal+Kamat+Restaurant+Yedenipani+%28Charge_iN%29%2C+Yedenipani+%2F+Kameri+area%2C+Kolhapur%2C+Maharashtra%2C+India" },
+            { id: "L06", name: "Hyundai McD Haldiram Station", area: "Shivaji University area", op: "Hyundai", config: "180 kW DC; CCS2; 3 guns", note: "Reported 24 h; directory reports 86% availability", review: "No exact name match in 46-row master; deduplicate site", lat: 16.6785, lon: 74.2630, gmaps: "https://www.google.com/maps/search/?api=1&query=Hyundai+McD+Haldiram+Station%2C+Shivaji+University+area%2C+Kolhapur%2C+Maharashtra%2C+India" },
+            { id: "L07", name: "Mai Hyundai (ChargeZone)", area: "Kolhapur Railway Station area", op: "ChargeZone", config: "120 kW DC; CCS2; 2 guns", note: "Reported 24 h; directory reports 86% availability", review: "Possible overlap/alias — check against Mai Hyundai Statiq listing", lat: 16.7032, lon: 74.2382, gmaps: "https://www.google.com/maps/search/?api=1&query=Mai+Hyundai%2C+Kolhapur+Railway+Station+area%2C+Kolhapur%2C+Maharashtra%2C+India" },
+            { id: "L08", name: "AVADHUT PETROLEUM", area: "Nipani", op: "Statiq", config: "60 kW DC; CCS2; 2 guns", note: "Directory reports 0% availability; do not mark operational", review: "No exact name match in 46-row master; border corridor", lat: 16.4020, lon: 74.3820, gmaps: "https://www.google.com/maps/search/?api=1&query=AVADHUT+PETROLEUM%2C+Nipani%2C+Kolhapur%2C+Maharashtra%2C+India" },
+            { id: "L09", name: "HPCL Disha Petrolinks", area: "Gur Market Yard", op: "GMR / HPCL", config: "60 kW DC; CCS2; 2 guns", note: "Reported 24 h; directory reports 100% availability", review: "No exact name match in 46-row master; deduplicate site", lat: 16.7140, lon: 74.2580, gmaps: "https://www.google.com/maps/search/?api=1&query=HPCL+Disha+Petrolinks%2C+Gur+Market+Yard%2C+Kolhapur%2C+Maharashtra%2C+India" },
+            { id: "L10", name: "Hotel Vrishali Executive - DC Fast Charger", area: "Kolhapur city (Tarabai Park)", op: "goEgo", config: "120 kW DC; CCS2; 2 guns", note: "Reported 24 h; directory reports 100% availability", review: "No exact name match in 46-row master; deduplicate site", lat: 16.7105, lon: 74.2435, gmaps: "https://www.google.com/maps/search/?api=1&query=Hotel+Vrishali+Executive+-+DC+Fast+Charger%2C+Kolhapur+city%2C+Kolhapur%2C+Maharashtra%2C+India" },
+            { id: "L11", name: "Shreenath Petroleum", area: "Phulewadi", op: "GMR", config: "60 kW DC; CCS2; 2 guns", note: "Reported 24 h; directory reports 100% availability", review: "No exact name match in 46-row master; western entry corridor", lat: 16.6880, lon: 74.1950, gmaps: "https://www.google.com/maps/search/?api=1&query=Shreenath+Petroleum%2C+Phulewadi%2C+Kolhapur%2C+Maharashtra%2C+India" },
+            { id: "L12", name: "Jio-bp Mobility Station - Itkare", area: "Itkare / Kameri area", op: "Jio-bp pulse", config: "60 kW DC; CCS2; 2 guns", note: "Hours and current status not stated", review: "No exact name match in 46-row master; highway corridor", lat: 16.9420, lon: 74.2610, gmaps: "https://www.google.com/maps/search/?api=1&query=Jio-bp+Mobility+Station+-+Itkare%2C+Itkare+%2F+Kameri+area%2C+Kolhapur%2C+Maharashtra%2C+India" },
+            { id: "L13", name: "Hotel Udupi Grand", area: "Nipani", op: "TCZ", config: "120 kW DC; CCS2; 2 guns", note: "Directory reports 0% availability; verify before classification", review: "No exact name match in 46-row master", lat: 16.4050, lon: 74.3840, gmaps: "https://www.google.com/maps/search/?api=1&query=Hotel+Udupi+Grand%2C+Nipani%2C+Kolhapur%2C+Maharashtra%2C+India" },
+            { id: "L14", name: "MALI PETROLEUM", area: "Pattankodoli", op: "MALI", config: "60 kW DC; CCS2; 2 guns", note: "Directory reports 0% availability; verify before classification", review: "No exact name match in 46-row master", lat: 16.6820, lon: 74.3950, gmaps: "https://www.google.com/maps/search/?api=1&query=MALI+PETROLEUM%2C+Pattankodoli%2C+Kolhapur%2C+Maharashtra%2C+India" },
+            { id: "L15", name: "Burger King - Kolhapur", area: "Shivaji University area", op: "TCZ", config: "240 kW DC; CCS2; 2 guns", note: "Directory reports 0% availability; verify exact site & operator", review: "No exact name match in 46-row master", lat: 16.6795, lon: 74.2640, gmaps: "https://www.google.com/maps/search/?api=1&query=Burger+King+-+Kolhapur%2C+Shivaji+University+area%2C+Kolhapur%2C+Maharashtra%2C+India" },
+            { id: "L16", name: "Om Sai Highway Service", area: "Vadgaon area", op: "BPCL HelloBPCL", config: "120 kW DC; CCS2; 2 guns", note: "Reported 24 h; directory reports 72% availability", review: "Possible overlap/alias — reconcile against existing master", lat: 16.8310, lon: 74.2660, gmaps: "https://www.google.com/maps/search/?api=1&query=Om+Sai+Highway+Service%2C+Vadgaon+area%2C+Kolhapur%2C+Maharashtra%2C+India" },
+            { id: "L17", name: "Om Dutta Sai", area: "MIDC Shiroli", op: "Statiq", config: "60 kW DC; CCS2; 2 guns", note: "Directory reports 0% availability; compare with Shiroli records", review: "Possible overlap/alias — reconcile against existing master", lat: 16.7475, lon: 74.2765, gmaps: "https://www.google.com/maps/search/?api=1&query=Om+Dutta+Sai%2C+MIDC+Shiroli%2C+Kolhapur%2C+Maharashtra%2C+India" },
+            { id: "L18", name: "PATIL PETROLEUM", area: "Phulewadi", op: "PATIL", config: "120 kW DC; CCS2; 2 guns", note: "Reported 24 h; directory reports 86% availability", review: "No exact name match in 46-row master; western corridor", lat: 16.6865, lon: 74.1935, gmaps: "https://www.google.com/maps/search/?api=1&query=PATIL+PETROLEUM%2C+Phulewadi%2C+Kolhapur%2C+Maharashtra%2C+India" },
+            { id: "L19", name: "Ambap Phata", area: "Ambap Phata / Vadgaon area", op: "BPCL HelloBPCL", config: "60 kW DC; CCS2; 2 guns", note: "Hours/status not stated; needs precise geocoding", review: "No exact name match in 46-row master", lat: 16.8190, lon: 74.2640, gmaps: "https://www.google.com/maps/search/?api=1&query=Ambap+Phata%2C+Ambap+Phata+%2F+Vadgaon+area%2C+Kolhapur%2C+Maharashtra%2C+India" },
+            { id: "L20", name: "At Po Mouje Ambewadi", area: "Ambewadi", op: "BPCL HelloBPCL", config: "60 kW DC; CCS2; 2 guns", note: "Hours/status not stated; needs precise geocoding", review: "No exact name match in 46-row master", lat: 16.7180, lon: 74.1850, gmaps: "https://www.google.com/maps/search/?api=1&query=At+Po+Mouje+Ambewadi%2C+Ambewadi%2C+Kolhapur%2C+Maharashtra%2C+India" },
+            { id: "L21", name: "At Post Donavade", area: "Donavade / Kuditre area", op: "BPCL HelloBPCL", config: "60 kW DC; CCS2; 2 guns", note: "Hours/status not stated; needs precise geocoding", review: "No exact name match in 46-row master", lat: 16.6750, lon: 74.1520, gmaps: "https://www.google.com/maps/search/?api=1&query=At+Post+Donavade%2C+Donavade+%2F+Kuditre+area%2C+Kolhapur%2C+Maharashtra%2C+India" },
+            { id: "L22", name: "Gat No. 1265/2 - Yelur", area: "Yelur", op: "BPCL HelloBPCL", config: "60 kW DC; CCS2; 2 guns", note: "Address-style listing; confirm exact site", review: "No exact name match in 46-row master", lat: 16.9150, lon: 74.2420, gmaps: "https://www.google.com/maps/search/?api=1&query=Gat+No.+1265%2F2+-+Yelur%2C+Yelur%2C+Kolhapur%2C+Maharashtra%2C+India" },
+            { id: "L23", name: "Gat No. 263 Survey No. 249/5", area: "Gargoti", op: "BPCL HelloBPCL", config: "60 kW DC; CCS2; 2 guns", note: "Address-style listing; confirm exact site", review: "No exact name match in 46-row master", lat: 16.3120, lon: 74.1420, gmaps: "https://www.google.com/maps/search/?api=1&query=Gat+No.+263+Survey+No.+249%2F5%2C+Gargoti%2C+Kolhapur%2C+Maharashtra%2C+India" },
+            { id: "L24", name: "Gat No. 1 - Pattankodoli", area: "Pattankodoli", op: "BPCL HelloBPCL", config: "120 kW DC; CCS2; 2 guns", note: "Address-style listing; confirm exact site", review: "No exact name match in 46-row master", lat: 16.6835, lon: 74.3970, gmaps: "https://www.google.com/maps/search/?api=1&query=Gat+No.+1+-+Pattankodoli%2C+Pattankodoli%2C+Kolhapur%2C+Maharashtra%2C+India" },
+            { id: "L25", name: "Kolhapur City - Ushgaon/Mudshingi", area: "Ushgaon / Mudshingi", op: "BPCL HelloBPCL", config: "60 kW DC; CCS2; 2 guns", note: "Compare with existing BPCL Uchgaon/Mudshingi record (#34)", review: "Possible overlap/alias — reconcile against existing master", lat: 16.6895, lon: 74.3075, gmaps: "https://www.google.com/maps/search/?api=1&query=Kolhapur+City+-+Ushgaon%2FMudshingi%2C+Ushgaon+%2F+Mudshingi%2C+Kolhapur%2C+Maharashtra%2C+India" },
+            { id: "L26", name: "Kolhapur Gaganbavda Road", area: "Gaganbavda Road / Phulewadi", op: "BPCL HelloBPCL", config: "120 kW DC; CCS2; 2 guns", note: "Confirm exact location and whether already represented", review: "No exact name match in 46-row master", lat: 16.6840, lon: 74.1880, gmaps: "https://www.google.com/maps/search/?api=1&query=Kolhapur+Gaganbavda+Road%2C+Gaganbavda+Road+%2F+Phulewadi%2C+Kolhapur%2C+Maharashtra%2C+India" },
+            { id: "L27", name: "Nagaon Fata", area: "Nagaon Phata / MIDC Shiroli", op: "BPCL HelloBPCL", config: "60 kW DC; CCS2; 2 guns", note: "Compare with existing Nagaon/Shiroli records", review: "Possible overlap/alias — reconcile against existing master", lat: 16.7620, lon: 74.2690, gmaps: "https://www.google.com/maps/search/?api=1&query=Nagaon+Fata%2C+Nagaon+Phata+%2F+MIDC+Shiroli%2C+Kolhapur%2C+Maharashtra%2C+India" }
+        ];
+
+        // 10 Showroom & Hotel Sayaji Rechecked Leads (N01–N10 • Added from Kolhapur_EV_Master_Rechecked_Showroom_Leads_2026-10-26.xlsx)
+        const showroomLeads = [
+            { id: "N01", name: "E-Fill – DYP City Mall", area: "Kawala Naka, near Hotel Sayaji", op: "E-Fill / DYP City Mall", details: "Directory lists charging; older project record reported 120 + 60 kW DC", decision: "Existing site to reconcile", handling: "Do not count separately from Vijaya Power/DYP City Mall until physical equipment & operator are reconciled", verify: "Location supported; current live status/spec needs operator/app check", lat: 16.7036, lon: 74.2508, gmaps: "https://www.google.com/maps/search/?api=1&query=E-Fill+%E2%80%93+DYP+City+Mall%2C+Kawala+Naka%2C+near+Hotel+Sayaji%2C+Kolhapur%2C+Maharashtra" },
+            { id: "N02", name: "Vijaya Power Charging Station", area: "DYP City Mall, Kawala Naka", op: "Vijaya Power", details: "Directory reports 60 kW + 30 kW and 3 points", decision: "Existing site / alias review", handling: "Likely same DYP City Mall charging location as E-Fill listing; verify exact equipment and operator", verify: "Listing found (evselect.in); not independently live-tested", lat: 16.7031, lon: 74.2501, gmaps: "https://www.google.com/maps/search/?api=1&query=Vijaya+Power+Charging+Station%2C+DYP+City+Mall%2C+Kawala+Naka%2C+Kolhapur%2C+Maharashtra" },
+            { id: "N03", name: "MAI Hyundai Kolhapur / ChargeZone", area: "GPT Complex, 517-E, Old P.B. Hwy, opp. Opal Hotel", op: "ChargeZone / Statiq directory", details: "CCS2 DC; sources report 30 kW and 120 kW, conflicting", decision: "Existing site — specification conflict", handling: "Merge alternate network names if same physical charger; preserve conflicting ratings until verified", verify: "Location and connector supported; current power rating needs reconciliation", lat: 16.7042, lon: 74.2478, gmaps: "https://www.google.com/maps/search/?api=1&query=MAI+Hyundai+Kolhapur+%2F+ChargeZone%2C+GPT+Complex%2C+517-E%2C+Old+Pune-Bangalore+Highway%2C+opposite+Opal+Hotel%2C+Kolhapur%2C+Maharashtra" },
+            { id: "N04", name: "Hyundai McD Haldiram Station", area: "Shivaji University area", op: "Hyundai / directory listing", details: "Reported 180 kW DC, CCS2, 3 guns", decision: "Candidate — check if distinct", handling: "Compare coordinates/address with existing McDonald's / Hyundai records; do not count twice", verify: "Directory listing found; precise site and live status not confirmed", lat: 16.6788, lon: 74.2635, gmaps: "https://www.google.com/maps/search/?api=1&query=Hyundai+McD+Haldiram+Station%2C+Shivaji+University+area%2C+Kolhapur%2C+Maharashtra" },
+            { id: "N05", name: "Konduskar Kia", area: "Shiroli MIDC, Bengaluru-Pune Highway", op: "Tata Power-related listing", details: "Charging point listed; exact power/connectors not confirmed from result", decision: "Candidate / existing-record cross-check", handling: "Check against existing Shiroli/Tata Power records; merge only if same site", verify: "Listing found; current charger details need verification", lat: 16.7438, lon: 74.2790, gmaps: "https://www.google.com/maps/search/?api=1&query=Konduskar+Kia%2C+Shiroli+MIDC%2C+Bengaluru-Pune+Highway%2C+Kolhapur%2C+Maharashtra" },
+            { id: "N06", name: "Mohite Suzuki – Kawala Naka", area: "Rote Chambers, Old P.B. Road, 517 A/1, Shivaji Park", op: "Suzuki dealership / local business listing", details: "No reliable public connector/power details found", decision: "Unverified lead — not confirmed public charger", handling: "Do not count as public infrastructure until on-site charger and public access are confirmed", verify: "Business found; charging availability/specifications unverified", lat: 16.7048, lon: 74.2465, gmaps: "https://www.google.com/maps/search/?api=1&query=Mohite+Suzuki+%E2%80%93+Kawala+Naka%2C+Rote+Chambers%2C+Old+P.B.+Road%2C+517+A%2F1%2C+Shivaji+Park%2C+Kolhapur%2C+Maharashtra" },
+            { id: "N07", name: "Unique Hyundai – Shiroli", area: "Pune-Bangalore Highway, Shiroli MIDC", op: "Hyundai / possible ChargeZone listing", details: "Directory sources may list a Hyundai charging point in Shiroli; details conflict with nearby listings", decision: "Candidate — verify exact physical site", handling: "Separate from MAI Hyundai central Kolhapur; compare with Tata Power–Unique Automobiles and MG Garage", verify: "Needs address/operator confirmation before adding as distinct public site", lat: 16.7468, lon: 74.2788, gmaps: "https://www.google.com/maps/search/?api=1&query=Unique+Hyundai+%E2%80%93+Shiroli%2C+Pune-Bangalore+Highway%2C+Shiroli+MIDC%2C+Kolhapur%2C+Maharashtra" },
+            { id: "N08", name: "Reliance Mall charging station", area: "Subhash Road, Old Dalal Market, Laxmipuri", op: "Jio-bp pulse / directory listing", details: "Directory reports public DC CCS2 up to 30 kW", decision: "New candidate — check master", handling: "Search existing records for Jio-bp / Reliance Mall alias before adding", verify: "Directory listing found; live status not independently checked", lat: 16.7015, lon: 74.2265, gmaps: "https://www.google.com/maps/search/?api=1&query=Reliance+Mall+charging+station%2C+Subhash+Road%2C+Old+Dalal+Market%2C+Laxmipuri%2C+Kolhapur%2C+Maharashtra" },
+            { id: "N09", name: "Hotel Jurkis Thali Junction", area: "NH service road, near Burger King, Sarnobatwadi", op: "E-Fill / Statiq-related listings", details: "Directory reports CCS2 DC, around 30–60 kW depending on source", decision: "Existing record / spec review", handling: "May overlap existing McDonald's / Sarnobatwadi or highway leads; use exact coordinates to deduplicate", verify: "Listing found; exact rated power and current availability need operator check", lat: 16.6808, lon: 74.2718, gmaps: "https://www.google.com/maps/search/?api=1&query=Hotel+Jurkis+Thali+Junction%2C+NH+service+road%2C+near+Burger+King%2C+Sarnobatwadi%2C+Kolhapur%2C+Maharashtra" },
+            { id: "N10", name: "Kolhapur Railway Station – Zeon", area: "Railway Station, New Shahupuri", op: "Zeon", details: "Reported 30 kW DC CCS2", decision: "Existing record cross-check", handling: "Likely already present in existing master under railway station (#30); confirm no duplicate", verify: "Directory listing found; live status not independently checked", lat: 16.7022, lon: 74.2372, gmaps: "https://www.google.com/maps/search/?api=1&query=Kolhapur+Railway+Station+%E2%80%93+Zeon%2C+Railway+Station%2C+New+Shahupuri%2C+Kolhapur%2C+Maharashtra" }
+        ];
+
+        // Initialize Leaflet GIS Map with Free Tile Servers that NEVER block local file:// protocol
+        const map = L.map('gisMap').setView([16.7033, 74.2450], 12);
+
+        const tileLayers = {
+            street: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+                maxZoom: 19,
+                attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, OpenStreetMap contributors'
+            }),
+            googleRoad: L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+                maxZoom: 20,
+                attribution: 'Map data &copy; Google Streets | Kolhapur EV GIS Audit'
+            }),
+            topo: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+                maxZoom: 17,
+                attribution: 'Map data: &copy; OpenStreetMap contributors, SRTM | Map style: &copy; OpenTopoMap'
+            }),
+            esriSat: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                maxZoom: 19,
+                attribution: 'Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics'
+            })
+        };
+
+        let currentBaseLayer = tileLayers.street;
+        currentBaseLayer.addTo(map);
+
+        function switchBasemap(key) {
+            map.removeLayer(currentBaseLayer);
+            currentBaseLayer = tileLayers[key] || tileLayers.street;
+            currentBaseLayer.addTo(map);
+        }
+
+        const layer2W = L.layerGroup().addTo(map);
+        const layerCar = L.layerGroup().addTo(map);
+        const layerLeads = L.layerGroup().addTo(map);
+        const layerShowroom = L.layerGroup().addTo(map);
+        const layerDeserts = L.layerGroup().addTo(map);
+        const layerBuffers = L.layerGroup();
+        const markerMap = {};
+        const showroomMarkerMap = {};
+
+        // Plot all 47 Master Stations + Service Buffers
+        const heatPoints = [];
+        masterStations.forEach(s => {
+            const is2WOrMixed = s.vehicle.includes('2W') || s.id === 47;
+            const color = s.id === 47 ? '#059669' : (is2WOrMixed ? '#10b981' : '#2563eb');
+            const fillColor = s.id === 47 ? '#10b981' : (is2WOrMixed ? '#34d399' : '#3b82f6');
+
+            const marker = L.circleMarker([s.lat, s.lon], {
+                radius: s.exactCoord ? 9 : 7,
+                color: s.exactCoord ? '#f59e0b' : '#0f172a',
+                weight: s.exactCoord ? 2.5 : 1.5,
+                fillColor: fillColor,
+                fillOpacity: 0.92
+            }).bindPopup(`
+                <div class="p-1 text-xs space-y-1">
+                    <div class="font-bold text-slate-900 text-sm">#${s.id} • ${s.name}</div>
+                    <div class="text-slate-600"><strong>Locality:</strong> ${s.area} (${s.scope})</div>
+                    <div><strong>Operator:</strong> ${s.op}</div>
+                    <div><strong>Target Segment:</strong> <span class="font-semibold ${is2WOrMixed ? 'text-emerald-700' : 'text-blue-700'}">${s.vehicle}</span></div>
+                    <div><strong>Specs:</strong> ${s.specs}</div>
+                    <div><strong>Audit Status:</strong> ${s.status}</div>
+                    <div class="text-[11px] font-semibold ${s.exactCoord ? 'text-emerald-700' : 'text-amber-700'}">
+                        ${s.exactCoord ? '★ Published Registry Coords: ' : '○ Locality Pin: '} ${s.lat.toFixed(5)}°N, ${s.lon.toFixed(5)}°E
+                    </div>
+                    <div class="text-[10px] text-slate-500">${s.coordNote}</div>
+                    <div class="pt-1">
+                        <a href="${s.gmaps}" target="_blank" class="text-blue-600 font-bold hover:underline">Verify on Google Maps ↗</a>
+                    </div>
+                </div>
+            `);
+
+            markerMap[s.id] = marker;
+            if (is2WOrMixed) layer2W.addLayer(marker);
+            else layerCar.addLayer(marker);
+
+            // Add 1 km buffer circle
+            const circle = L.circle([s.lat, s.lon], {
+                radius: 1000,
+                color: color,
+                weight: 1,
+                fillColor: color,
+                fillOpacity: 0.08
+            });
+            layerBuffers.addLayer(circle);
+
+            heatPoints.push([s.lat, s.lon, is2WOrMixed ? 0.9 : 0.6]);
+        });
+
+        // Plot 27 New Candidate Leads (Oct 2026) in Purple
+        candidateLeads.forEach(l => {
+            L.circleMarker([l.lat, l.lon], {
+                radius: 6,
+                color: '#581c87',
+                weight: 1.5,
+                fillColor: '#a855f7',
+                fillOpacity: 0.85
+            }).bindPopup(`
+                <div class="p-1 text-xs space-y-1">
+                    <div class="text-[10px] font-bold uppercase text-purple-700">Oct 2026 Candidate Lead (${l.id})</div>
+                    <div class="font-bold text-slate-900 text-sm">${l.name}</div>
+                    <div><strong>Locality:</strong> ${l.area} | <strong>Operator:</strong> ${l.op}</div>
+                    <div><strong>Reported Config:</strong> ${l.config}</div>
+                    <div><strong>Status Note:</strong> ${l.note}</div>
+                    <div class="text-[10px] text-slate-500">${l.review}</div>
+                    <div class="pt-1">
+                        <a href="${l.gmaps}" target="_blank" class="text-purple-700 font-bold hover:underline">Check on Google Maps ↗</a>
+                    </div>
+                </div>
+            `).addTo(layerLeads);
+        });
+
+        // Plot 10 Showroom & Hotel Sayaji Rechecked Leads (N01–N10) in Amber/Orange
+        showroomLeads.forEach(n => {
+            const m = L.circleMarker([n.lat, n.lon], {
+                radius: 7.5,
+                color: '#78350f',
+                weight: 2,
+                fillColor: '#f59e0b',
+                fillOpacity: 0.9
+            }).bindPopup(`
+                <div class="p-1 text-xs space-y-1">
+                    <div class="text-[10px] font-bold uppercase text-amber-700">Showroom &amp; Sayaji Audit (${n.id})</div>
+                    <div class="font-bold text-slate-900 text-sm">${n.name}</div>
+                    <div><strong>Landmark:</strong> ${n.area}</div>
+                    <div><strong>Operator Shown:</strong> ${n.op}</div>
+                    <div><strong>Reported Details:</strong> ${n.details}</div>
+                    <div><strong>Audit Decision:</strong> <span class="font-semibold text-amber-800">${n.decision}</span></div>
+                    <div class="text-[10px] text-slate-500">${n.handling}</div>
+                    <div class="pt-1">
+                        <a href="${n.gmaps}" target="_blank" class="text-amber-700 font-bold hover:underline">Verify on Google Maps ↗</a>
+                    </div>
+                </div>
+            `).addTo(layerShowroom);
+            showroomMarkerMap[n.id] = m;
+        });
+
+        // Verified Faulted 120 kW Stations Callout Markers
+        const faultedSites = [
+            { name: "Hotel 7/12 Food Mall (Statiq Verified)", lat: 16.7280, lon: 74.2690, note: "120 kW DC (2x CCS2) — BOTH CONNECTORS FAULTED in audit snapshot" },
+            { name: "Solanki and Sons EV (Statiq Verified)", lat: 16.6990, lon: 74.2480, note: "120 kW DC (2x CCS2) — BOTH CONNECTORS FAULTED in audit snapshot" }
+        ];
+        faultedSites.forEach(f => {
+            L.circleMarker([f.lat, f.lon], {
+                radius: 10,
+                color: '#e11d48',
+                weight: 3,
+                fillColor: '#f43f5e',
+                fillOpacity: 0.4
+            }).bindPopup(`<div class="text-xs"><strong class="text-rose-600">⚠️ FAULTED FAST CHARGER: ${f.name}</strong><br/>${f.note}</div>`).addTo(layerCar);
+        });
+
+        // Add 4 Underserved "Charging Desert" Polygons in Kolhapur City
+        const chargingDeserts = [
+            {
+                name: "Charging Desert 1: Shivaji Peth & Rankala Residential Belt",
+                coords: [[16.686, 74.205], [16.698, 74.205], [16.698, 74.220], [16.686, 74.220]],
+                desc: "High-density residential ward with heavy 2W ownership and 0 public charging hubs."
+            },
+            {
+                name: "Charging Desert 2: Mangalwar Peth & Khasbag Belt",
+                coords: [[16.680, 74.221], [16.690, 74.221], [16.690, 74.234], [16.680, 74.234]],
+                desc: "Dense old-city residential zone lacking public AC slow-charging points."
+            },
+            {
+                name: "Charging Desert 3: Laxmipuri & Gujari Commercial Core",
+                coords: [[16.699, 74.218], [16.707, 74.218], [16.707, 74.229], [16.699, 74.229]],
+                desc: "Major commercial & wholesale trade ward with severe daytime 2W parking demand (N08 Reliance Mall is a 30 kW DC car candidate under review)."
+            },
+            {
+                name: "Charging Desert 4: Shivaji University & Rajaram College Campus",
+                coords: [[16.672, 74.248], [16.684, 74.248], [16.684, 74.262], [16.672, 74.262]],
+                desc: "Thousands of daily student & faculty 2-wheelers; zero public campus EV chargers."
+            }
+        ];
+
+        chargingDeserts.forEach(d => {
+            L.polygon(d.coords, {
+                color: '#e11d48',
+                weight: 2,
+                dashArray: '5, 5',
+                fillColor: '#f43f5e',
+                fillOpacity: 0.22
+            }).bindPopup(`<div class="text-xs"><strong class="text-rose-700">${d.name}</strong><br/>${d.desc}</div>`).addTo(layerDeserts);
+        });
+
+        // Heatmap Layer
+        const heatLayer = L.heatLayer(heatPoints, { radius: 28, blur: 18, maxZoom: 14 });
+
+        // Layer Checkboxes
+        document.getElementById('toggle2W').addEventListener('change', e => e.target.checked ? map.addLayer(layer2W) : map.removeLayer(layer2W));
+        document.getElementById('toggleCar').addEventListener('change', e => e.target.checked ? map.addLayer(layerCar) : map.removeLayer(layerCar));
+        document.getElementById('toggleLeads').addEventListener('change', e => e.target.checked ? map.addLayer(layerLeads) : map.removeLayer(layerLeads));
+        document.getElementById('toggleShowroom').addEventListener('change', e => e.target.checked ? map.addLayer(layerShowroom) : map.removeLayer(layerShowroom));
+        document.getElementById('toggleDeserts').addEventListener('change', e => e.target.checked ? map.addLayer(layerDeserts) : map.removeLayer(layerDeserts));
+        document.getElementById('toggleBuffers').addEventListener('change', e => e.target.checked ? map.addLayer(layerBuffers) : map.removeLayer(layerBuffers));
+        document.getElementById('toggleHeat').addEventListener('change', e => e.target.checked ? map.addLayer(heatLayer) : map.removeLayer(heatLayer));
+
+        function flyToView(lat, lon, zoom) {
+            map.flyTo([lat, lon], zoom, { duration: 1.2 });
+        }
+
+        function locateStation(id) {
+            const s = masterStations.find(x => x.id === id);
+            if (!s) return;
+            document.getElementById('gis-section').scrollIntoView({ behavior: 'smooth' });
+            setTimeout(() => {
+                map.flyTo([s.lat, s.lon], 15, { duration: 1.2 });
+                markerMap[id].openPopup();
+            }, 450);
+        }
+
+        function locateShowroomLead(id) {
+            const n = showroomLeads.find(x => x.id === id);
+            if (!n) return;
+            document.getElementById('gis-section').scrollIntoView({ behavior: 'smooth' });
+            setTimeout(() => {
+                map.flyTo([n.lat, n.lon], 15, { duration: 1.2 });
+                if (showroomMarkerMap[id]) showroomMarkerMap[id].openPopup();
+            }, 450);
+        }
+
+        // 3-Way Tab Switcher between 47 Master Directory, 27 ChargeDekho Leads, and 10 Showroom & Sayaji Leads
+        function switchDirectoryTab(tab) {
+            const masterContainer = document.getElementById('masterTabContainer');
+            const leadsContainer = document.getElementById('leadsTabContainer');
+            const showroomContainer = document.getElementById('showroomTabContainer');
+            const btnM = document.getElementById('tabMasterBtn');
+            const btnL = document.getElementById('tabLeadsBtn');
+            const btnS = document.getElementById('tabShowroomBtn');
+
+            masterContainer.classList.add('hidden');
+            leadsContainer.classList.add('hidden');
+            showroomContainer.classList.add('hidden');
+
+            btnM.className = "px-3.5 py-2 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition";
+            btnL.className = "px-3.5 py-2 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition";
+            btnS.className = "px-3.5 py-2 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition";
+
+            if (tab === 'MASTER') {
+                masterContainer.classList.remove('hidden');
+                btnM.className = "px-3.5 py-2 rounded-lg text-xs font-bold bg-slate-900 text-white shadow-sm transition";
+            } else if (tab === 'LEADS') {
+                leadsContainer.classList.remove('hidden');
+                btnL.className = "px-3.5 py-2 rounded-lg text-xs font-bold bg-purple-700 text-white shadow-sm transition";
+            } else if (tab === 'SHOWROOM') {
+                showroomContainer.classList.remove('hidden');
+                btnS.className = "px-3.5 py-2 rounded-lg text-xs font-bold bg-amber-600 text-white shadow-sm transition";
+            }
+        }
+
+        // Participatory Citizen Pin Mode
+        let citizenPinMode = false;
+        let citizenPinCount = 0;
+        function toggleCitizenPinMode() {
+            citizenPinMode = !citizenPinMode;
+            const btn = document.getElementById('citizenPinModeBtn');
+            const txt = document.getElementById('pinModeText');
+            if (citizenPinMode) {
+                btn.className = "bg-rose-600 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 shadow-sm animate-pulse";
+                txt.innerText = "Click Anywhere on Map to Drop Citizen Pin (Active)";
+            } else {
+                btn.className = "bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 shadow-sm";
+                txt.innerText = "Click Map to Suggest New Charger Pin";
+            }
+        }
+
+        map.on('click', function (e) {
+            if (!citizenPinMode) return;
+            citizenPinCount++;
+            const lat = e.latlng.lat.toFixed(4);
+            const lon = e.latlng.lng.toFixed(4);
+            L.circleMarker([e.latlng.lat, e.latlng.lng], {
+                radius: 9,
+                color: '#fff',
+                weight: 2,
+                fillColor: '#f59e0b',
+                fillOpacity: 1
+            }).addTo(map).bindPopup(`<div class="text-xs"><strong>Citizen Requested EV Charger #${citizenPinCount}</strong><br/>Coords: ${lat}°N, ${lon}°E<br/><em>Logged for KMC Ward Review</em></div>`).openPopup();
+
+            const logEl = document.getElementById('userPinList');
+            if (citizenPinCount === 1) logEl.innerHTML = '';
+            logEl.innerHTML += `<div class="mt-1 text-emerald-300">✓ Pin #${citizenPinCount} added at ${lat}°N, ${lon}°E</div>`;
+        });
+
+        // Render 47-Station Master Table
+        function renderTable() {
+            const q = document.getElementById('searchInput').value.toLowerCase();
+            const scope = document.getElementById('scopeFilter').value;
+            const veh = document.getElementById('vehicleFilter').value;
+            const ver = document.getElementById('verifyFilter').value;
+
+            const filtered = masterStations.filter(s => {
+                const matchQ = (s.name + ' ' + s.area + ' ' + s.op + ' ' + s.specs + ' ' + s.status).toLowerCase().includes(q);
+                const matchScope = scope === 'ALL' || s.scope === scope;
+                const is2WOrMixed = s.vehicle.includes('2W') || s.id === 47;
+                const matchVeh = veh === 'ALL' || (veh === '2W' && is2WOrMixed) || (veh === 'CAR' && !is2WOrMixed);
+                const matchVer = ver === 'ALL' || (ver === 'EXACT' && s.exactCoord) || s.verify === ver;
+                return matchQ && matchScope && matchVeh && matchVer;
+            });
+
+            document.getElementById('stationCount').innerText = filtered.length;
+            const tbody = document.getElementById('stationTableBody');
+            tbody.innerHTML = filtered.map(s => {
+                const is2WOrMixed = s.vehicle.includes('2W') || s.id === 47;
+                const vehBadge = is2WOrMixed
+                    ? `<span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-800">${s.vehicle}</span>`
+                    : `<span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-blue-100 text-blue-800">${s.vehicle}</span>`;
+                const coordBadge = s.exactCoord
+                    ? `<span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-300 mb-1">★ Published Coords (${s.lat.toFixed(4)}, ${s.lon.toFixed(4)})</span>`
+                    : `<span class="inline-block px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-600 mb-1">Pending Exact Pin (Locality Approx)</span>`;
+
+                return `
+                    <tr class="hover:bg-slate-50 transition ${s.id === 47 ? 'bg-emerald-50/50' : ''}">
+                        <td class="py-3 px-4 font-mono text-xs text-slate-500 font-bold">${s.id}</td>
+                        <td class="py-3 px-4">
+                            <div class="font-bold text-slate-900">${s.name}</div>
+                            <div class="text-xs text-slate-500">Operator: ${s.op}</div>
+                        </td>
+                        <td class="py-3 px-4 font-medium text-slate-700">${s.area} <span class="text-xs text-slate-400">(${s.scope})</span></td>
+                        <td class="py-3 px-4">${vehBadge}</td>
+                        <td class="py-3 px-4 text-xs text-slate-600">${s.specs}</td>
+                        <td class="py-3 px-4 text-xs text-slate-600">
+                            ${coordBadge}
+                            <div><strong>${s.verify}:</strong> ${s.status}</div>
+                        </td>
+                        <td class="py-3 px-4 text-right space-y-1">
+                            <button onclick="locateStation(${s.id})" class="w-full bg-slate-900 hover:bg-emerald-600 text-white text-[11px] font-semibold px-3 py-1.5 rounded-lg transition block text-center">
+                                Locate on GIS ↗
+                            </button>
+                            <a href="${s.gmaps}" target="_blank" rel="noopener noreferrer" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-semibold px-2.5 py-1 rounded-lg transition block text-center border border-slate-300">
+                                Google Maps ↗
+                            </a>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Render 27 New Candidate Leads Table
+        function renderLeadsTable() {
+            const q = (document.getElementById('leadSearchInput').value || '').toLowerCase();
+            const filtered = candidateLeads.filter(l => (l.id + ' ' + l.name + ' ' + l.area + ' ' + l.op + ' ' + l.config + ' ' + l.note).toLowerCase().includes(q));
+            const tbody = document.getElementById('leadsTableBody');
+            tbody.innerHTML = filtered.map(l => {
+                const isZero = l.note.includes('0% availability');
+                return `
+                    <tr class="hover:bg-purple-50/40 transition">
+                        <td class="py-3 px-4 font-mono text-xs font-bold text-purple-700">${l.id}</td>
+                        <td class="py-3 px-4 font-bold text-slate-900">${l.name}</td>
+                        <td class="py-3 px-4 text-xs font-medium text-slate-700">${l.area}</td>
+                        <td class="py-3 px-4 text-xs"><span class="px-2 py-0.5 rounded bg-purple-100 text-purple-800 font-semibold">${l.op}</span></td>
+                        <td class="py-3 px-4 text-xs font-semibold text-slate-800">${l.config}</td>
+                        <td class="py-3 px-4 text-xs text-slate-600">
+                            <div class="${isZero ? 'text-rose-600 font-semibold' : 'text-slate-700'}">${l.note}</div>
+                            <div class="text-[11px] text-slate-400">${l.review}</div>
+                        </td>
+                        <td class="py-3 px-4 text-right">
+                            <a href="${l.gmaps}" target="_blank" rel="noopener noreferrer" class="inline-block bg-purple-700 hover:bg-purple-600 text-white text-[11px] font-semibold px-3 py-1.5 rounded-lg transition">
+                                Maps Search ↗
+                            </a>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Render 10 Showroom & Hotel Sayaji Leads Table (N01–N10)
+        function renderShowroomTable() {
+            const q = (document.getElementById('showroomSearchInput').value || '').toLowerCase();
+            const filtered = showroomLeads.filter(n => (n.id + ' ' + n.name + ' ' + n.area + ' ' + n.op + ' ' + n.details + ' ' + n.decision + ' ' + n.handling).toLowerCase().includes(q));
+            const tbody = document.getElementById('showroomTableBody');
+            tbody.innerHTML = filtered.map(n => {
+                const isUnverified = n.id === 'N06';
+                const isNew = n.id === 'N08';
+                const badgeClass = isUnverified
+                    ? 'bg-rose-100 text-rose-800 border-rose-300'
+                    : (isNew ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-amber-100 text-amber-900 border-amber-300');
+                return `
+                    <tr class="hover:bg-amber-50/40 transition">
+                        <td class="py-3 px-4 font-mono text-xs font-bold text-amber-700">${n.id}</td>
+                        <td class="py-3 px-4 font-bold text-slate-900">${n.name}</td>
+                        <td class="py-3 px-4 text-xs font-medium text-slate-700">${n.area}</td>
+                        <td class="py-3 px-4 text-xs text-slate-700">${n.op}</td>
+                        <td class="py-3 px-4 text-xs font-semibold text-slate-800">${n.details}</td>
+                        <td class="py-3 px-4 text-xs text-slate-600">
+                            <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold border ${badgeClass} mb-1">${n.decision}</span>
+                            <div class="text-[11px] text-slate-600">${n.handling}</div>
+                            <div class="text-[10px] text-slate-400 mt-0.5">${n.verify}</div>
+                        </td>
+                        <td class="py-3 px-4 text-right space-y-1">
+                            <button onclick="locateShowroomLead('${n.id}')" class="w-full bg-amber-600 hover:bg-amber-500 text-white text-[11px] font-semibold px-3 py-1.5 rounded-lg transition block text-center">
+                                Locate on GIS ↗
+                            </button>
+                            <a href="${n.gmaps}" target="_blank" rel="noopener noreferrer" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-semibold px-2.5 py-1 rounded-lg transition block text-center border border-slate-300">
+                                Google Maps ↗
+                            </a>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        ['searchInput', 'scopeFilter', 'vehicleFilter', 'verifyFilter'].forEach(id => {
+            document.getElementById(id).addEventListener('input', renderTable);
+        });
+        document.getElementById('leadSearchInput').addEventListener('input', renderLeadsTable);
+        document.getElementById('showroomSearchInput').addEventListener('input', renderShowroomTable);
+        renderTable();
+        renderLeadsTable();
+        renderShowroomTable();
+
+        // Charts Initialization (Updated for 47-Station Master, 27 Leads & 10 Showroom Leads)
+        new Chart(document.getElementById('mismatchChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Electric 2-Wheelers', 'Electric Cars / 4W', 'Multi-Vehicle / 3W / Gov (#47)'],
+                datasets: [
+                    { label: 'Share of EV Registrations FY 24–25 (%)', data: [96.91, 2.61, 0.48], backgroundColor: '#10b981', borderRadius: 6 },
+                    { label: 'Share of 47 Master Stations (%)', data: [19.15, 72.34, 8.51], backgroundColor: '#3b82f6', borderRadius: 6 }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 100 } } }
+        });
+
+        new Chart(document.getElementById('growthChart'), {
+            type: 'bar',
+            data: {
+                labels: ['FY 2023–24', 'FY 2024–25'],
+                datasets: [
+                    { label: 'Total District EVs (+45.89%)', data: [10312, 15044], backgroundColor: '#1e3a8a', borderRadius: 6 },
+                    { label: 'Electric 2-Wheelers (+45.17%)', data: [10043, 14579], backgroundColor: '#10b981', borderRadius: 6 }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+
+        new Chart(document.getElementById('benchmarkChart'), {
+            type: 'bar',
+            data: {
+                labels: ['ChargeDekho Points', 'EcoGears Stations', 'ChargeDekho Pages', 'Project Master Rows', 'ChargeRadar / evgoo', 'FAME-II Installed', 'CarDekho / ZigWheels', 'Oct 2026 Leads (L)', 'Showroom Leads (N)'],
+                datasets: [{
+                    label: 'Reported Count (26 Oct 2026 Cross-Check)',
+                    data: [105, 87, 57, 47, 38, 35, 28, 27, 10],
+                    backgroundColor: ['#6366f1', '#8b5cf6', '#3b82f6', '#10b981', '#06b6d4', '#f59e0b', '#64748b', '#a855f7', '#ec4899'],
+                    borderRadius: 5
+                }]
+            },
+            options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        });
+
+        new Chart(document.getElementById('auditChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Available (8 Connectors)', 'Faulted / Offline (4 Connectors)', 'Preparing (1 Connector)', 'Unverified Live State (3 Connectors)'],
+                datasets: [{ data: [8, 4, 1, 3], backgroundColor: ['#10b981', '#ef4444', '#f59e0b', '#94a3b8'] }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+        });
+
+        // Genuine Google Form Survey Data (N = 39 Responses, Q7 & Q9)
+        new Chart(document.getElementById('communityPainChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Hard to Find (30)', 'Long Wait Queue (12)', 'Unavailable/Broken (9)', 'Slow Charging (5)', 'Poor Maintenance (5)'],
+                datasets: [{ data: [76.92, 30.77, 23.08, 12.82, 12.82], backgroundColor: '#34d399', borderRadius: 4 }]
+            },
+            options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#cbd5e1', callback: v => v + '%' } }, y: { ticks: { color: '#f8fafc', font: { size: 10 } } } } }
+        });
+
+        // Genuine Google Form Survey Data (N = 39 Responses, Q12 Multiple Choice)
+        new Chart(document.getElementById('communityLocChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Colleges / Offices (29)', 'Malls / Commercial (23)', 'Highways / Roads (20)', 'Markets (18)', 'Residential Areas (15)', 'Bus / Rail Stations (11)'],
+                datasets: [{ data: [74.36, 58.97, 51.28, 46.15, 38.46, 28.21], backgroundColor: '#60a5fa', borderRadius: 4 }]
+            },
+            options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#cbd5e1', callback: v => v + '%' } }, y: { ticks: { color: '#f8fafc', font: { size: 10 } } } } }
+        });
+
+        // Interactive Business Model 5-Year Cumulative Cash-Flow Chart
+        const bizChart = new Chart(document.getElementById('bizCashflowChart'), {
+            type: 'line',
+            data: {
+                labels: ['Year 0 (CAPEX)', 'Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5'],
+                datasets: [
+                    {
+                        label: 'Simulated Station Cumulative Net Cash Flow (₹ Lakhs)',
+                        data: [-12.0, -6.61, -1.23, 4.16, 9.54, 14.93],
+                        borderColor: '#34d399',
+                        backgroundColor: 'rgba(52, 211, 153, 0.15)',
+                        borderWidth: 3,
+                        pointRadius: 4,
+                        fill: true,
+                        tension: 0.25
+                    },
+                    {
+                        label: 'Breakeven Threshold (₹0)',
+                        data: [0, 0, 0, 0, 0, 0],
+                        borderColor: '#f43f5e',
+                        borderWidth: 1.5,
+                        borderDash: [5, 5],
+                        pointRadius: 0,
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { labels: { color: '#f8fafc', font: { size: 11 } } } },
+                scales: {
+                    x: { ticks: { color: '#cbd5e1' }, grid: { color: '#334155' } },
+                    y: { ticks: { color: '#cbd5e1', callback: v => '₹' + v + 'L' }, grid: { color: '#334155' } }
+                }
+            }
+        });
+
+        function loadBizPreset(tier) {
+            if (tier === 1) {
+                document.getElementById('simKw').value = 33;
+                document.getElementById('simCapex').value = 320000;
+                document.getElementById('simUtil').value = 18.0;
+                document.getElementById('simTariff').value = 13.5;
+                document.getElementById('simCost').value = 7.8;
+                document.getElementById('simFixed').value = 13450;
+            } else if (tier === 2) {
+                document.getElementById('simKw').value = 70;
+                document.getElementById('simCapex').value = 1200000;
+                document.getElementById('simUtil').value = 14.0;
+                document.getElementById('simTariff').value = 18.5;
+                document.getElementById('simCost').value = 8.1;
+                document.getElementById('simFixed').value = 28500;
+            } else if (tier === 3) {
+                document.getElementById('simKw').value = 180;
+                document.getElementById('simCapex').value = 2920000;
+                document.getElementById('simUtil').value = 12.0;
+                document.getElementById('simTariff').value = 21.0;
+                document.getElementById('simCost').value = 8.3;
+                document.getElementById('simFixed').value = 62000;
+            }
+            updateBizSimulator();
+        }
+
+        function updateBizSimulator() {
+            const kw = parseFloat(document.getElementById('simKw').value);
+            const capex = parseFloat(document.getElementById('simCapex').value);
+            const util = parseFloat(document.getElementById('simUtil').value);
+            const tariff = parseFloat(document.getElementById('simTariff').value);
+            const cost = parseFloat(document.getElementById('simCost').value);
+            const fixed = parseFloat(document.getElementById('simFixed').value);
+
+            const hrsPerDay = (24.0 * util / 100.0).toFixed(2);
+            document.getElementById('lblBizKw').innerText = `${kw} kW`;
+            document.getElementById('lblBizCapex').innerText = `₹${capex.toLocaleString('en-IN')}`;
+            document.getElementById('lblBizUtil').innerText = `${util.toFixed(1)}% (${hrsPerDay} hrs/day)`;
+            document.getElementById('lblBizTariff').innerText = `₹${tariff.toFixed(2)}/kWh`;
+            document.getElementById('lblBizCost').innerText = `₹${cost.toFixed(2)}/kWh`;
+            document.getElementById('lblBizFixed').innerText = `₹${fixed.toLocaleString('en-IN')} / mo`;
+
+            const dailyKwh = kw * 24.0 * (util / 100.0);
+            const monthlyKwh = dailyKwh * 30.0;
+            const grossRev = monthlyKwh * tariff;
+            const energyCost = monthlyKwh * cost;
+            const netEbitda = grossRev - energyCost - fixed;
+            const annualEbitda = netEbitda * 12.0;
+            const roiPct = (annualEbitda / capex) * 100.0;
+            const paybackMo = netEbitda > 0 ? (capex / netEbitda) : 999;
+
+            const marginPerKwh = Math.max(0.1, tariff - cost);
+            const beMonthlyKwh = fixed / marginPerKwh;
+            const beUtilPct = (beMonthlyKwh / (kw * 24.0 * 30.0)) * 100.0;
+
+            document.getElementById('outBizKwh').innerText = `${Math.round(monthlyKwh).toLocaleString('en-IN')} kWh`;
+            document.getElementById('outBizDailyKwh').innerText = `${dailyKwh.toFixed(1)} kWh / day`;
+            document.getElementById('outBizEbitda').innerText = `${netEbitda >= 0 ? '₹' : '-₹'}${Math.round(Math.abs(netEbitda)).toLocaleString('en-IN')}`;
+            document.getElementById('outBizEbitda').className = `text-lg font-extrabold mt-0.5 ${netEbitda >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+            document.getElementById('outBizGross').innerText = `Gross: ₹${Math.round(grossRev).toLocaleString('en-IN')}/mo`;
+            document.getElementById('outBizPayback').innerText = netEbitda > 0 ? `${paybackMo.toFixed(1)} Mo` : 'N/A (Loss)';
+            document.getElementById('outBizRoi').innerText = `Annual ROI: ${roiPct.toFixed(1)}%`;
+            document.getElementById('outBizBreakeven').innerText = `${beUtilPct.toFixed(2)}%`;
+            document.getElementById('outBizBeKwh').innerText = `${Math.round(beMonthlyKwh).toLocaleString('en-IN')} kWh / mo`;
+
+            // Update 5-year cumulative cash-flow array (in Rs. Lakhs)
+            const capexL = capex / 100000.0;
+            const annL = annualEbitda / 100000.0;
+            const cfData = [
+                parseFloat((-capexL).toFixed(2)),
+                parseFloat((-capexL + annL * 1).toFixed(2)),
+                parseFloat((-capexL + annL * 2).toFixed(2)),
+                parseFloat((-capexL + annL * 3).toFixed(2)),
+                parseFloat((-capexL + annL * 4).toFixed(2)),
+                parseFloat((-capexL + annL * 5).toFixed(2))
+            ];
+            bizChart.data.datasets[0].data = cfData;
+            bizChart.update();
+        }
+        updateBizSimulator();
+
+        // Live CSV Reader for Google Form Responses
+        document.getElementById('csvFileInput').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function (evt) {
+                const text = evt.target.result.trim();
+                const rows = text.split('\n').map(r => r.split(','));
+                const headers = rows[0];
+                const dataRows = rows.slice(1);
+                const badge = document.getElementById('surveyBadge');
+                badge.innerText = `Live Synced: ${dataRows.length} Responses`;
+                badge.className = "text-[11px] bg-emerald-500/20 text-emerald-300 px-2.5 py-0.5 rounded-full border border-emerald-400/30";
+                const summaryBox = document.getElementById('csvSummaryBox');
+                summaryBox.classList.remove('hidden');
+                summaryBox.innerHTML = `<div class="font-bold text-emerald-400">Parsed ${dataRows.length} Google Form Responses</div><div class="text-slate-300">Columns: ${headers.slice(0, 5).join(' • ')}</div>`;
+            };
+            reader.readAsText(file);
+        });
+    </script>
+</body>
+
+</html>
